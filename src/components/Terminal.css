@@ -1,0 +1,131 @@
+.terminal-hub {
+  height: calc(100vh - 100px);
+  margin: 15px;
+  background: rgba(1, 2, 6, 0.85); /* Darker glass */
+  border: 1px solid var(--glass-border);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  position: relative;
+  box-shadow: 0 0 30px rgba(0, 0, 0, 0.5);
+}
+
+.terminal-header {
+  padding: 10px 20px;
+  background: rgba(0, 240, 255, 0.05);
+  border-bottom: 1px solid var(--glass-border);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.terminal-status-icon {
+  color: var(--neon-cyan);
+}
+
+.terminal-title {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 11px;
+  letter-spacing: 2px;
+  color: rgba(0, 240, 255, 0.7);
+  flex: 1;
+}
+
+.terminal-dots {
+  display: flex;
+  gap: 6px;
+}
+
+.terminal-dots span {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--glass-border);
+}
+
+.terminal-body {
+  flex: 1;
+  padding: 20px;
+  overflow-y: auto;
+  font-family: 'Fira Code', monospace;
+  font-size: 14px;
+  line-height: 1.5;
+  position: relative;
+}
+
+/* Scanlines Effect */
+.scanlines {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    rgba(18, 16, 16, 0) 50%,
+    rgba(0, 0, 0, 0.1) 50%
+  );
+  background-size: 100% 4px;
+  z-index: 10;
+  pointer-events: none;
+  opacity: 0.3;
+}
+
+.terminal-line {
+  margin-bottom: 4px;
+  word-break: break-all;
+  white-space: pre-wrap;
+}
+
+.terminal-line.input { color: #fff; }
+.terminal-line.system { color: #777; }
+.terminal-line.success { color: var(--neon-green); text-shadow: 0 0 5px rgba(0, 255, 65, 0.3); }
+.terminal-line.error { color: var(--neon-pink); }
+.terminal-line.info { color: #D4B261; } /* Gold from Search Lights */
+.terminal-line.neon { color: var(--neon-cyan); text-shadow: 0 0 5px rgba(0, 240, 255, 0.3); }
+.terminal-line.dim { color: rgba(255, 255, 255, 0.3); font-size: 13px; }
+
+.terminal-input-line {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 5px;
+}
+
+.terminal-prompt {
+  color: var(--neon-green);
+  font-weight: bold;
+}
+
+.terminal-input-line input {
+  flex: 1;
+  background: transparent !important;
+  border: none !important;
+  color: #fff !important;
+  font-family: 'Fira Code', monospace !important;
+  font-size: 14px !important;
+  padding: 0 !important;
+  outline: none !important;
+  caret-color: var(--neon-cyan);
+}
+
+.terminal-input-line input:focus {
+  box-shadow: none !important;
+}
+
+/* Scrollbar Customization */
+.scrollbar-hidden::-webkit-scrollbar {
+  width: 4px;
+}
+
+.scrollbar-hidden::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.scrollbar-hidden::-webkit-scrollbar-thumb {
+  background: var(--glass-border);
+  border-radius: 10px;
+}
+
+.scrollbar-hidden::-webkit-scrollbar-thumb:hover {
+  background: var(--neon-cyan);
+}

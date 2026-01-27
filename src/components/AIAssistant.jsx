@@ -1,11 +1,19 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { FiSend, FiZap } from 'react-icons/fi';
 import useStore from '../store/useStore';
-import { callOpenAI, callClaude } from '../utils/aiClient';
+import { callOpenAI, callClaude, callOpenRouter } from '../utils/aiClient';
 import './AIAssistant.css';
 
 const AIAssistant = () => {
-  const { openaiKey, claudeKey, toggleSettings, currentFileContent } = useStore();
+  const { 
+    openaiKey, 
+    claudeKey, 
+    openrouterKey, 
+    selectedModels, 
+    setSelectedModel,
+    toggleSettings, 
+    currentFileContent 
+  } = useStore();
   const [provider, setProvider] = useState('openai');
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
@@ -21,7 +29,10 @@ const AIAssistant = () => {
     scrollToBottom();
   }, [messages, isLoading]);
 
-  const hasApiKey = provider === 'openai' ? openaiKey : claudeKey;
+  const hasApiKey = 
+    provider === 'openai' ? openaiKey : 
+    provider === 'claude' ? claudeKey : 
+    openrouterKey;
 
   const handleSend = async () => {
     if (!input.trim() || !hasApiKey) return;
@@ -43,13 +54,19 @@ const AIAssistant = () => {
       if (provider === 'openai') {
         response = await callOpenAI(
           openaiKey,
-          'gpt-3.5-turbo',
+          selectedModels.openai,
           chatMessages
         );
-      } else {
+      } else if (provider === 'claude') {
         response = await callClaude(
           claudeKey,
-          'claude-3-sonnet-20240229',
+          selectedModels.claude,
+          chatMessages
+        );
+      } else if (provider === 'openrouter') {
+        response = await callOpenRouter(
+          openrouterKey,
+          selectedModels.openrouter,
           chatMessages
         );
       }
@@ -143,6 +160,38 @@ const AIAssistant = () => {
           >
             Claude
           </button>
+          <button
+            className={`provider-btn ${provider === 'openrouter' ? 'active' : ''}`}
+            onClick={() => setProvider('openrouter')}
+            disabled={!openrouterKey}
+          >
+            OpenRouter
+          </button>
+        </div>
+        <div className="model-selector-mini">
+           {provider === 'openai' && (
+             <select value={selectedModels.openai} onChange={(e) => setSelectedModel('openai', e.target.value)}>
+               <option value="gpt-4">GPT-4</option>
+               <option value="gpt-4-turbo-preview">GPT-4 Turbo</option>
+               <option value="gpt-3.5-turbo">GPT-3.5 Turbo</option>
+             </select>
+           )}
+           {provider === 'claude' && (
+             <select value={selectedModels.claude} onChange={(e) => setSelectedModel('claude', e.target.value)}>
+               <option value="claude-3-opus-20240229">Claude 3 Opus</option>
+               <option value="claude-3-sonnet-20240229">Claude 3 Sonnet</option>
+               <option value="claude-3-haiku-20240307">Claude 3 Haiku</option>
+             </select>
+           )}
+           {provider === 'openrouter' && (
+             <select value={selectedModels.openrouter} onChange={(e) => setSelectedModel('openrouter', e.target.value)}>
+               <option value="deepseek/deepseek-chat">DeepSeek Chat</option>
+               <option value="google/gemini-pro-1.5">Gemini Pro 1.5</option>
+               <option value="meta-llama/llama-3-70b-instruct">Llama 3 70B</option>
+               <option value="anthropic/claude-3-haiku">Claude 3 Haiku</option>
+               <option value="mistralai/mixtral-8x7b-instruct">Mixtral 8x7B</option>
+             </select>
+           )}
         </div>
       </div>
 

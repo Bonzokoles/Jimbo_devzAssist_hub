@@ -23,6 +23,13 @@ const Settings = () => {
   const [claudeTestStatus, setClaudeTestStatus] = useState(null);
   const [testingClaude, setTestingClaude] = useState(false);
 
+  // OpenRouter
+  const [openrouterKeyInput, setOpenrouterKeyInput] = useState('');
+  const [openrouterModel, setOpenrouterModel] = useState('openai/gpt-3.5-turbo');
+  const [showOpenrouterKey, setShowOpenrouterKey] = useState(false);
+  const [openrouterTestStatus, setOpenrouterTestStatus] = useState(null);
+  const [testingOpenrouter, setTestingOpenrouter] = useState(false);
+
   useEffect(() => {
     if (settingsOpen) {
       loadApiKeys();
@@ -33,6 +40,7 @@ const Settings = () => {
     try {
       const openaiKey = await getAPIKey('openai');
       const claudeKey = await getAPIKey('claude');
+      const openrouterKey = await getAPIKey('openrouter');
       
       if (openaiKey) {
         setOpenaiKeyInput(openaiKey);
@@ -41,6 +49,10 @@ const Settings = () => {
       if (claudeKey) {
         setClaudeKeyInput(claudeKey);
         setClaudeKey(claudeKey);
+      }
+      if (openrouterKey) {
+        setOpenrouterKeyInput(openrouterKey);
+        setOpenRouterKey(openrouterKey);
       }
     } catch (error) {
       console.error('Failed to load API keys:', error);
@@ -93,6 +105,29 @@ const Settings = () => {
     }
   };
 
+  const handleTestOpenRouter = async () => {
+    if (!openrouterKeyInput.trim()) {
+      setOpenrouterTestStatus({ success: false, message: 'Please enter an API key' });
+      return;
+    }
+
+    setTestingOpenrouter(true);
+    setOpenrouterTestStatus(null);
+
+    try {
+      const success = await testOpenRouterConnection(openrouterKeyInput);
+      if (success) {
+        setOpenrouterTestStatus({ success: true, message: 'Connection successful!' });
+      } else {
+        setOpenrouterTestStatus({ success: false, message: 'Connection failed. Check your API key.' });
+      }
+    } catch (error) {
+      setOpenrouterTestStatus({ success: false, message: 'Connection failed: ' + error.message });
+    } finally {
+      setTestingOpenrouter(false);
+    }
+  };
+
   const handleSave = async () => {
     try {
       if (openaiKeyInput.trim()) {
@@ -102,6 +137,10 @@ const Settings = () => {
       if (claudeKeyInput.trim()) {
         await saveAPIKey('claude', claudeKeyInput);
         setClaudeKey(claudeKeyInput);
+      }
+      if (openrouterKeyInput.trim()) {
+        await saveAPIKey('openrouter', openrouterKeyInput);
+        setOpenRouterKey(openrouterKeyInput);
       }
       
       alert('Settings saved successfully!');
@@ -251,6 +290,60 @@ const Settings = () => {
                     <option value="claude-3-opus-20240229">Claude 3 Opus</option>
                     <option value="claude-3-sonnet-20240229">Claude 3 Sonnet</option>
                     <option value="claude-3-haiku-20240307">Claude 3 Haiku</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="settings-section">
+                <h3>OpenRouter Configuration (Multi-Model)</h3>
+                <div className="form-group">
+                  <label>API Key</label>
+                  <div className="input-wrapper">
+                    <input
+                      type={showOpenrouterKey ? 'text' : 'password'}
+                      value={openrouterKeyInput}
+                      onChange={(e) => setOpenrouterKeyInput(e.target.value)}
+                      placeholder="sk-or-..."
+                      style={{ paddingRight: '45px' }}
+                    />
+                    <button
+                      className="toggle-visibility-btn"
+                      onClick={() => setShowOpenrouterKey(!showOpenrouterKey)}
+                      style={{ position: 'absolute' }}
+                    >
+                      {showOpenrouterKey ? <FiEyeOff /> : <FiEye />}
+                    </button>
+                  </div>
+                  <p className="provider-info">
+                    Get access to 100+ models at <a href="https://openrouter.ai/keys" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--neon-cyan)' }}>OpenRouter.ai</a>
+                  </p>
+                </div>
+
+                <div className="input-wrapper">
+                  <button
+                    className="test-connection-btn"
+                    onClick={handleTestOpenRouter}
+                    disabled={testingOpenrouter || !openrouterKeyInput.trim()}
+                  >
+                    {testingOpenrouter ? 'Testing...' : 'Test Connection'}
+                  </button>
+                </div>
+
+                {openrouterTestStatus && (
+                  <div className={`connection-status ${openrouterTestStatus.success ? 'success' : 'error'}`}>
+                    {openrouterTestStatus.success ? <FiCheck /> : <FiAlertCircle />}
+                    {openrouterTestStatus.message}
+                  </div>
+                )}
+
+                <div className="form-group model-select">
+                  <label>Initial Model</label>
+                  <select value={openrouterModel} onChange={(e) => setOpenrouterModel(e.target.value)}>
+                    <option value="deepseek/deepseek-chat">DeepSeek Chat</option>
+                    <option value="google/gemini-pro-1.5">Gemini Pro 1.5</option>
+                    <option value="meta-llama/llama-3-70b-instruct">Llama 3 70B</option>
+                    <option value="anthropic/claude-3-haiku">Claude 3 Haiku (via OR)</option>
+                    <option value="mistralai/mixtral-8x7b-instruct">Mixtral 8x7B</option>
                   </select>
                 </div>
               </div>

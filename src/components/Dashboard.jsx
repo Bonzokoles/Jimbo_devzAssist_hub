@@ -1,10 +1,67 @@
 import React from 'react';
 import { FiFolder, FiGitCommit, FiCode, FiZap, FiPlus } from 'react-icons/fi';
+import { open } from '@tauri-apps/api/dialog';
 import useStore from '../store/useStore';
 import './Dashboard.css';
 
 const Dashboard = () => {
-  const { stats, projects, setCurrentView } = useStore();
+  const { stats, projects, addProject, setCurrentView, setWorkspaceRoot, setProjectHandle } = useStore();
+
+  const handleNewProject = async () => {
+    // Check if we are in Tauri environment
+    const isTauri = window.__TAURI_IPC__ !== undefined;
+
+    try {
+      if (isTauri) {
+        // Desktop Mode: Use Tauri Dialog
+        const selected = await open({
+          directory: true,
+          multiple: false,
+          title: 'Select Project Directory'
+        });
+
+        if (selected) {
+          registerProject(selected);
+        }
+      } else {
+        // Web Mode: Use Browser File System Access API
+        if ('showDirectoryPicker' in window) {
+          const handle = await window.showDirectoryPicker();
+          registerProject(handle.name, handle);
+        } else {
+          alert('Your browser does not support folder selection. Please use the Desktop App.');
+        }
+      }
+    } catch (err) {
+      console.error('Failed to open project:', err);
+      // Only show alert if it's not a user cancellation
+      if (err !== 'user cancelled') {
+        alert('Action failed: ' + err);
+      }
+    }
+  };
+
+  const registerProject = (pathOrName, handle = null) => {
+    const projectName = pathOrName.split?.('\\').pop() || pathOrName.split?.('/').pop() || pathOrName;
+    addProject({
+      id: Date.now(),
+      name: projectName,
+      path: typeof pathOrName === 'string' ? pathOrName : null,
+      handle: handle, // For Web mode
+      status: 'active',
+      files: '---',
+      lastModified: 'Just now'
+    });
+    setWorkspaceRoot(pathOrName); 
+    if (handle) setProjectHandle(handle);
+    setCurrentView('editor');
+  };
+
+  const handleProjectClick = (project) => {
+    setWorkspaceRoot(project.path || project.name);
+    if (project.handle) setProjectHandle(project.handle);
+    setCurrentView('editor');
+  };
 
   const statCards = [
     { label: 'Total Projects', value: stats.totalProjects, icon: FiFolder, color: 'green' },
@@ -49,7 +106,7 @@ const Dashboard = () => {
               key={project.id} 
               className="project-item fade-in" 
               style={{ animationDelay: `${(index + 4) * 0.1}s` }}
-              onClick={() => setCurrentView('editor')}
+              onClick={() => handleProjectClick(project)}
             >
               <div className="project-info">
                 <div className="project-icon">
@@ -72,7 +129,7 @@ const Dashboard = () => {
       </div>
 
       <div className="quick-actions">
-        <button className="neon-button">
+        <button className="neon-button" onClick={handleNewProject}>
           <FiPlus style={{ marginRight: '8px' }} />
           New Project
         </button>

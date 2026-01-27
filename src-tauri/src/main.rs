@@ -8,6 +8,13 @@ use sysinfo::{System, SystemExt, CpuExt, DiskExt};
 use tauri::api::path;
 
 #[derive(Debug, Serialize, Deserialize)]
+struct FileEntry {
+    name: String,
+    path: String,
+    is_dir: bool,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
 struct SystemStats {
     cpu_usage: f32,
     memory_total: u64,
@@ -182,15 +189,72 @@ async fn read_file_content(path_str: String) -> Result<String, String> {
     fs::read_to_string(path).map_err(|e| format!("Failed to read file: {}", e))
 }
 
+    fs::write(path, content).map_err(|e| format!("Failed to write file: {}", e))
+}
+
 #[tauri::command]
-async fn write_file_content(path_str: String, content: String) -> Result<(), String> {
+async fn get_podman_containers() -> Result<String, String> {
+    let output = std::process::Command::new("podman")
+        .args(["ps", "-a", "--format", "json"])
+        .output()
+        .map_err(|e| format!("Failed to execute podman: {}", e))?;
+
+    if !output.status.success() {
+        return Err(String::from_utf8_lossy(&output.stderr).to_string());
+    }
+
+    Ok(String::from_utf8_lossy(&output.stdout).to_string())
+}
+
+#[tauri::command]
+async fn manage_podman_container(id: String, action: String) -> Result<String, String> {
+    let output = std::process::Command::new("podman")
+        .args([&action, &id])
+        .output()
+        .map_err(|e| format!("Failed to execute podman {}: {}", action, e))?;
+
+    if !output.status.success() {
+        return Err(String::from_utf8_lossy(&output.stderr).to_string());
+    }
+
+    Ok(format!("Container {} {} successfully", id, action))
+}
+
+#[tauri::command]
+async fn check_localhost_port(port: u16) -> bool {
+    use std::net::{TcpStream, SocketAddr, IpAddr, Ipv4Addr};
+    use std::time::Duration;
+
+    let addr = SocketAddr::new(IpAddr::V4(Ipv4Addr::new(127, 0, 0, 1)), port);
+    TcpStream::connect_timeout(&addr, Duration::from_millis(500)).is_ok()
+}
+
+#[tauri::command]
+async fn read_dir(path_str: String) -> Result<Vec<FileEntry>, String> {
     let path = Path::new(&path_str);
+    let entries = fs::read_dir(path).map_err(|e| format!("Failed to read directory: {}", e))?;
     
-    if let Some(parent) = path.parent() {
-        fs::create_dir_all(parent).map_err(|e| format!("Failed to create parent directory: {}", e))?;
+    let mut files = Vec::new();
+    for entry in entries {
+        let entry = entry.map_err(|e| format!("Failed to read entry: {}", e))?;
+        let metadata = entry.metadata().map_err(|e| format!("Failed to get metadata: {}", e))?;
+        files.push(FileEntry {
+            name: entry.file_name().to_string_lossy().to_string(),
+            path: entry.path().to_string_lossy().to_string(),
+            is_dir: metadata.is_dir(),
+        });
     }
     
-    fs::write(path, content).map_err(|e| format!("Failed to write file: {}", e))
+    // Sort directories first, then alphabetical
+    files.sort_by(|a, b| {
+        if a.is_dir != b.is_dir {
+            b.is_dir.cmp(&a.is_dir)
+        } else {
+            a.name.cmp(&b.name)
+        }
+    });
+
+    Ok(files)
 }
 
 fn main() {
@@ -205,6 +269,10 @@ fn main() {
             get_api_key,
             read_file_content,
             write_file_content,
+            get_podman_containers,
+            manage_podman_container,
+            check_localhost_port,
+            read_dir,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

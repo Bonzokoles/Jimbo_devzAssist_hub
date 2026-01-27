@@ -1,12 +1,16 @@
 :root {
-  --neon-green: #00ff41;
-  --neon-cyan: #00f0ff;
-  --neon-pink: #ff006e;
-  --neon-purple: #b000ff;
-  --bg-dark: #0a0e27;
-  --bg-darker: #050814;
-  --glass-bg: rgba(255, 255, 255, 0.05);
-  --glass-border: rgba(255, 255, 255, 0.1);
+  /* Further Dimmed Neons (additional ~30% reduction) */
+  --neon-green: #007d20;   /* was #00b32d */
+  --neon-cyan: #00757d;    /* was #00a8b3 */
+  --neon-pink: #7d0036;    /* was #b3004d */
+  --neon-purple: #56007d;  /* was #7b00b3 */
+  
+  /* Even Darker Backgrounds */
+  --bg-dark: #03040c;      /* was #05071a */
+  --bg-darker: #010206;    /* was #02040a */
+  
+  --glass-bg: rgba(255, 255, 255, 0.02);
+  --glass-border: rgba(255, 255, 255, 0.05);
 }
 
 * {
@@ -18,7 +22,7 @@
 body {
   font-family: 'Rajdhani', sans-serif;
   background: var(--bg-darker);
-  color: #fff;
+  color: #a0a0a0; /* Dimmed text for lower contrast (was #fff) */
   overflow: hidden;
 }
 
@@ -33,6 +37,36 @@ code, pre {
 }
 
 /* Glassmorphism Card */
+/* Global Dark Forms & Buttons */
+input, select, textarea {
+  background: #020205 !important;
+  color: #a0a0a0 !important;
+  border: 1px solid var(--glass-border) !important;
+  border-radius: 4px;
+  padding: 8px 12px;
+  font-family: 'Rajdhani', sans-serif;
+  transition: all 0.3s ease;
+}
+
+input:focus, select:focus {
+  border-color: var(--neon-cyan) !important;
+  box-shadow: 0 0 10px rgba(0, 240, 255, 0.2);
+  outline: none;
+}
+
+button:not(.primary) {
+  background: #050508;
+  color: #a0a0a0;
+  border: 1px solid var(--glass-border);
+  transition: all 0.3s ease;
+}
+
+button:not(.primary):hover {
+  background: #0a0a12;
+  color: var(--neon-cyan);
+  border-color: var(--neon-cyan);
+}
+
 .glass-card {
   background: var(--glass-bg);
   backdrop-filter: blur(20px);

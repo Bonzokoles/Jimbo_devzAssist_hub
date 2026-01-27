@@ -5,7 +5,8 @@ import {
   FiActivity, 
   FiZap, 
   FiTerminal, 
-  FiSettings 
+  FiSettings,
+  FiServer
 } from 'react-icons/fi';
 import useStore from '../store/useStore';
 import './Sidebar.css';
@@ -18,7 +19,8 @@ const Sidebar = () => {
     { id: 'editor', icon: FiCode, label: 'Code Editor' },
     { id: 'monitor', icon: FiActivity, label: 'System Monitor' },
     { id: 'integrations', icon: FiZap, label: 'Integrations' },
-    { id: 'terminal', icon: FiTerminal, label: 'Terminal' },
+    { id: 'infra', icon: FiServer, label: 'Infrastructure Hub' },
+    { id: 'terminal', icon: FiTerminal, label: 'Terminal Hub' },
   ];
 
   const hasApiKeys = openaiKey || claudeKey;

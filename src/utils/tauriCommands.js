@@ -62,3 +62,12 @@ export const writeFileContent = async (path, content) => {
     throw error;
   }
 };
+
+export const readDir = async (path) => {
+  try {
+    return await invoke('read_dir', { pathStr: path });
+  } catch (error) {
+    console.error('Failed to read directory:', error);
+    throw error;
+  }
+};

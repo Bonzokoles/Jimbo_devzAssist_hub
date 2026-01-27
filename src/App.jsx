@@ -9,19 +9,11 @@ import SystemMonitor from './components/SystemMonitor';
 import Integrations from './components/Integrations';
 import AIAssistant from './components/AIAssistant';
 import Settings from './components/Settings';
+import Terminal from './components/Terminal';
+import Infrastructure from './components/Infrastructure';
 import useStore from './store/useStore';
 import './App.css';
 
-const TerminalView = () => (
-  <div className="terminal-view">
-    <h2>Terminal</h2>
-    <div className="terminal-placeholder">
-      <FiTerminal className="terminal-icon" />
-      <p>Terminal feature coming soon...</p>
-      <p style={{ fontSize: '14px' }}>Integrated terminal with command execution</p>
-    </div>
-  </div>
-);
 
 function App() {
   const { currentView, aiPanelOpen } = useStore();
@@ -37,7 +29,9 @@ function App() {
       case 'integrations':
         return <Integrations />;
       case 'terminal':
-        return <TerminalView />;
+        return <Terminal />;
+      case 'infra':
+        return <Infrastructure />;
       default:
         return <Dashboard />;
     }

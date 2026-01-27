@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Editor from '@monaco-editor/react';
-import { FiSave, FiPlay, FiSettings, FiMaximize, FiCopy, FiTerminal } from 'react-icons/fi';
+import { FiSave, FiPlay, FiSettings, FiMaximize, FiCopy, FiTerminal, FiX } from 'react-icons/fi';
 import { writeFileContent } from '../utils/tauriCommands';
+import { executeCode } from '../utils/codeExecutor';
 import useStore from '../store/useStore';
 import './CodeEditor.css';
 
@@ -10,7 +11,8 @@ const CodeEditor = () => {
     currentFile, 
     currentFileHandle, 
     currentFileContent, 
-    setCurrentFileContent 
+    setCurrentFileContent,
+    workspaceRoot
   } = useStore();
   const [language, setLanguage] = useState('javascript');
   const [code, setCode] = useState(currentFileContent || '// Start coding...');
@@ -18,6 +20,34 @@ const CodeEditor = () => {
   const [systemPrompt, setSystemPrompt] = useState('You are an elite coding assistant...');
   const [agentPrompts, setAgentPrompts] = useState({}); // { 0: '...', 1: '...' }
   const [agentCodes, setAgentCodes] = useState({}); // { 0: '// Agent 1...', 1: '// Agent 2...' }
+  const [output, setOutput] = useState('');
+  const [isRunning, setIsRunning] = useState(false);
+
+  // Update code when currentFileContent changes
+  useEffect(() => {
+    if (currentFileContent !== undefined) {
+      setCode(currentFileContent);
+      // Auto-detect language from file extension
+      if (currentFile) {
+        const ext = currentFile.split('.').pop().toLowerCase();
+        const langMap = {
+          'js': 'javascript',
+          'jsx': 'javascript',
+          'ts': 'typescript',
+          'tsx': 'typescript',
+          'py': 'python',
+          'rs': 'rust',
+          'java': 'java',
+          'cpp': 'cpp',
+          'c': 'cpp',
+          'go': 'go',
+        };
+        if (langMap[ext]) {
+          setLanguage(langMap[ext]);
+        }
+      }
+    }
+  }, [currentFileContent, currentFile]);
 
   const handleSaveFile = async () => {
     if (!currentFile) {
@@ -81,8 +111,44 @@ const CodeEditor = () => {
     console.log('Saving file...');
   };
 
-  const handleRun = () => {
-    console.log('Running code...');
+  const handleRun = async () => {
+    if (!currentFile) {
+      alert('No file selected. Please save the file first before running.');
+      return;
+    }
+
+    setIsRunning(true);
+    setOutput('Running...\n');
+
+    try {
+      // Save the file first
+      await handleSaveFile();
+
+      // Determine working directory (use workspace root or file's directory)
+      const workingDir = workspaceRoot || currentFile.substring(0, currentFile.lastIndexOf('/'));
+      
+      // Execute the code
+      const result = await executeCode(currentFile, language, workingDir);
+      
+      let outputText = '';
+      if (result.stdout) {
+        outputText += result.stdout;
+      }
+      if (result.stderr) {
+        outputText += '\n--- STDERR ---\n' + result.stderr;
+      }
+      if (result.exit_code !== 0) {
+        outputText += `\n\nProcess exited with code ${result.exit_code}`;
+      } else {
+        outputText += `\n\nProcess completed successfully (exit code 0)`;
+      }
+      
+      setOutput(outputText || 'No output');
+    } catch (error) {
+      setOutput(`Error: ${error.message || error}`);
+    } finally {
+      setIsRunning(false);
+    }
   };
 
   const handlePromptKeyDown = (e, type, index = null) => {
@@ -213,6 +279,24 @@ const CodeEditor = () => {
           </div>
         ))}
       </div>
+
+      {/* Output Panel */}
+      {output && (
+        <div className="output-panel glass-card">
+          <div className="output-header">
+            <FiTerminal className="output-icon" />
+            <span className="output-title">Output</span>
+            <button 
+              className="output-close-btn" 
+              onClick={() => setOutput('')}
+              title="Close output"
+            >
+              <FiX />
+            </button>
+          </div>
+          <pre className="output-content scrollbar-hidden">{output}</pre>
+        </div>
+      )}
     </div>
   );
 };

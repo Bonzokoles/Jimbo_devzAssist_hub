@@ -220,7 +220,18 @@ pub async fn save_moa_scenario(
         .as_str()
         .ok_or("Scenario name not found")?;
     
-    let filename = format!("{}.json", name.replace(" ", "_").to_lowercase());
+    // Sanitize filename to prevent directory traversal and invalid characters
+    let sanitized_name = name
+        .chars()
+        .filter(|c| c.is_alphanumeric() || *c == '_' || *c == '-')
+        .collect::<String>()
+        .to_lowercase();
+    
+    if sanitized_name.is_empty() {
+        return Err("Invalid scenario name: must contain alphanumeric characters".to_string());
+    }
+    
+    let filename = format!("{}.json", sanitized_name);
     let scenario_file = scenarios_dir.join(filename);
     
     fs::write(scenario_file, scenario)
@@ -258,7 +269,19 @@ pub async fn delete_moa_scenario(
     name: String
 ) -> Result<(), String> {
     let scenarios_dir = get_scenarios_dir(&app_handle)?;
-    let filename = format!("{}.json", name.replace(" ", "_").to_lowercase());
+    
+    // Sanitize filename to prevent directory traversal
+    let sanitized_name = name
+        .chars()
+        .filter(|c| c.is_alphanumeric() || *c == '_' || *c == '-')
+        .collect::<String>()
+        .to_lowercase();
+    
+    if sanitized_name.is_empty() {
+        return Err("Invalid scenario name".to_string());
+    }
+    
+    let filename = format!("{}.json", sanitized_name);
     let scenario_file = scenarios_dir.join(filename);
     
     if scenario_file.exists() {

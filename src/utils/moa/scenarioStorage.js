@@ -84,9 +84,17 @@ export const importScenario = () => {
       reader.onload = (event) => {
         try {
           const scenario = JSON.parse(event.target.result);
+          
+          // Validate the imported scenario
+          const validation = validateScenario(scenario);
+          if (!validation.valid) {
+            reject(new Error('Invalid scenario: ' + validation.errors.join(', ')));
+            return;
+          }
+          
           resolve(scenario);
         } catch (error) {
-          reject(new Error('Invalid JSON file'));
+          reject(new Error('Invalid JSON file: ' + error.message));
         }
       };
       reader.onerror = () => reject(new Error('Failed to read file'));

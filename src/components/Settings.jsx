@@ -248,8 +248,9 @@ const Settings = () => {
               {currentProjectPath ? (
                 <WorkspacePrompt 
                   projectPath={currentProjectPath}
-                  value={workspacePrompt}
-                  onChange={setWorkspacePrompt}
+                  prompt={workspacePrompt}
+                  onPromptChange={setWorkspacePrompt}
+                  onProjectPathChange={() => {}}
                 />
               ) : (
                 <div style={{ 

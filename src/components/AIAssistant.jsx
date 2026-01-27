@@ -80,6 +80,28 @@ const AIAssistant = () => {
 
   const hasApiKey = provider === 'openai' ? openaiKey : claudeKey;
 
+  const copyToClipboard = async (text) => {
+    try {
+      await navigator.clipboard.writeText(text);
+    } catch (error) {
+      console.error('Clipboard API failed:', error);
+      // Fallback for older browsers
+      try {
+        const textArea = document.createElement('textarea');
+        textArea.value = text;
+        textArea.style.position = 'fixed';
+        textArea.style.left = '-9999px';
+        document.body.appendChild(textArea);
+        textArea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textArea);
+      } catch (fallbackError) {
+        console.error('Fallback copy failed:', fallbackError);
+        alert('Failed to copy to clipboard');
+      }
+    }
+  };
+
   const handleScenarioSelect = (e) => {
     const scenarioName = e.target.value;
     const scenario = moaScenarios.find(s => s.name === scenarioName);
@@ -321,7 +343,7 @@ const AIAssistant = () => {
                     <span className="moa-model-name">{resp.model}</span>
                     <button 
                       className="copy-btn"
-                      onClick={() => navigator.clipboard.writeText(resp.response)}
+                      onClick={() => copyToClipboard(resp.response)}
                       title="Copy response"
                     >
                       📋
@@ -343,7 +365,7 @@ const AIAssistant = () => {
               </div>
               <button 
                 className="copy-btn"
-                onClick={() => navigator.clipboard.writeText(moaResults.aggregated)}
+                onClick={() => copyToClipboard(moaResults.aggregated)}
               >
                 📋 Copy Aggregated
               </button>

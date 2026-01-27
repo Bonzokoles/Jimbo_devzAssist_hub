@@ -1,0 +1,245 @@
+.settings-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(10px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: fadeIn 0.3s ease;
+}
+
+.settings-modal {
+  width: 90%;
+  max-width: 700px;
+  max-height: 80vh;
+  background: var(--bg-dark);
+  border: 2px solid var(--neon-green);
+  border-radius: 12px;
+  box-shadow: 0 0 40px rgba(0, 255, 65, 0.3);
+  overflow: hidden;
+  animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.settings-header {
+  padding: 25px 30px;
+  background: rgba(0, 255, 65, 0.1);
+  border-bottom: 1px solid var(--glass-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.settings-header h2 {
+  font-size: 24px;
+  color: var(--neon-green);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.close-btn {
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 24px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  padding: 5px;
+  display: flex;
+  align-items: center;
+}
+
+.close-btn:hover {
+  color: var(--neon-pink);
+  transform: rotate(90deg);
+}
+
+.settings-content {
+  padding: 30px;
+  max-height: calc(80vh - 150px);
+  overflow-y: auto;
+}
+
+.settings-tabs {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 30px;
+  border-bottom: 1px solid var(--glass-border);
+}
+
+.tab-btn {
+  padding: 12px 24px;
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.6);
+  font-family: 'Orbitron', sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border-bottom: 2px solid transparent;
+  font-size: 14px;
+}
+
+.tab-btn:hover {
+  color: var(--neon-green);
+}
+
+.tab-btn.active {
+  color: var(--neon-green);
+  border-bottom-color: var(--neon-green);
+}
+
+.settings-section {
+  margin-bottom: 30px;
+}
+
+.settings-section h3 {
+  font-size: 18px;
+  color: var(--neon-cyan);
+  margin-bottom: 15px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.input-wrapper {
+  position: relative;
+  display: flex;
+  gap: 10px;
+}
+
+.input-wrapper input {
+  flex: 1;
+}
+
+.toggle-visibility-btn {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.5);
+  cursor: pointer;
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  transition: color 0.3s ease;
+}
+
+.toggle-visibility-btn:hover {
+  color: var(--neon-green);
+}
+
+.test-connection-btn {
+  padding: 10px 20px;
+  background: transparent;
+  border: 2px solid var(--neon-cyan);
+  color: var(--neon-cyan);
+  border-radius: 6px;
+  cursor: pointer;
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+}
+
+.test-connection-btn:hover:not(:disabled) {
+  background: var(--neon-cyan);
+  color: var(--bg-darker);
+  box-shadow: 0 0 15px var(--neon-cyan);
+}
+
+.test-connection-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.connection-status {
+  margin-top: 10px;
+  padding: 10px 15px;
+  border-radius: 6px;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.connection-status.success {
+  background: rgba(0, 255, 65, 0.2);
+  color: var(--neon-green);
+}
+
+.connection-status.error {
+  background: rgba(255, 0, 110, 0.2);
+  color: var(--neon-pink);
+}
+
+.model-select {
+  margin-top: 15px;
+}
+
+.settings-footer {
+  padding: 20px 30px;
+  background: rgba(0, 0, 0, 0.3);
+  border-top: 1px solid var(--glass-border);
+  display: flex;
+  justify-content: flex-end;
+  gap: 15px;
+}
+
+.save-btn {
+  padding: 12px 30px;
+  background: var(--neon-green);
+  color: var(--bg-darker);
+  border: none;
+  border-radius: 6px;
+  font-family: 'Orbitron', sans-serif;
+  font-weight: 700;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  letter-spacing: 1px;
+}
+
+.save-btn:hover {
+  box-shadow: 0 0 20px var(--neon-green);
+  transform: scale(1.05);
+}
+
+.provider-info {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.5);
+  margin-top: 5px;
+  line-height: 1.4;
+}

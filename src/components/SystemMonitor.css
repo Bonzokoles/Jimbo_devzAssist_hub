@@ -1,0 +1,128 @@
+.system-monitor {
+  padding: 30px;
+  height: calc(100vh - 70px);
+  overflow-y: auto;
+}
+
+.system-monitor h2 {
+  font-size: 24px;
+  color: var(--neon-green);
+  margin-bottom: 30px;
+}
+
+.monitor-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+  margin-bottom: 30px;
+}
+
+.monitor-card {
+  background: var(--glass-bg);
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--glass-border);
+  border-radius: 12px;
+  padding: 25px;
+  transition: all 0.3s ease;
+}
+
+.monitor-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 0 20px rgba(0, 255, 65, 0.2);
+}
+
+.monitor-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.monitor-label {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.monitor-icon {
+  font-size: 32px;
+  color: var(--neon-green);
+}
+
+.monitor-value {
+  font-size: 48px;
+  font-weight: 700;
+  font-family: 'Orbitron', sans-serif;
+  color: var(--neon-green);
+  text-shadow: 0 0 10px var(--neon-green);
+  margin-bottom: 10px;
+}
+
+.monitor-details {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.progress-ring {
+  width: 120px;
+  height: 120px;
+  margin: 0 auto 15px;
+  position: relative;
+}
+
+.progress-ring svg {
+  transform: rotate(-90deg);
+}
+
+.progress-ring-circle {
+  fill: none;
+  stroke: rgba(0, 255, 65, 0.1);
+  stroke-width: 8;
+}
+
+.progress-ring-progress {
+  fill: none;
+  stroke: var(--neon-green);
+  stroke-width: 8;
+  stroke-linecap: round;
+  filter: drop-shadow(0 0 8px var(--neon-green));
+  transition: stroke-dashoffset 0.5s ease;
+}
+
+.progress-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 24px;
+  font-weight: 700;
+  font-family: 'Orbitron', sans-serif;
+  color: var(--neon-green);
+}
+
+.charts-section {
+  margin-top: 40px;
+}
+
+.charts-section h3 {
+  font-size: 20px;
+  color: var(--neon-cyan);
+  margin-bottom: 20px;
+}
+
+.chart-container {
+  background: var(--glass-bg);
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--glass-border);
+  border-radius: 12px;
+  padding: 25px;
+  margin-bottom: 20px;
+}
+
+.optimization-actions {
+  display: flex;
+  gap: 15px;
+  margin-top: 30px;
+  flex-wrap: wrap;
+}

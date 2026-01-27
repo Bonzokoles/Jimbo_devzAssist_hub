@@ -1,0 +1,100 @@
+.scenario-manager {
+  padding: 20px 0;
+}
+
+.manager-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid rgba(0, 255, 255, 0.2);
+}
+
+.manager-header h3 {
+  margin: 0;
+  color: var(--neon-cyan);
+  font-size: 20px;
+}
+
+.manager-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.import-btn,
+.create-btn {
+  background: transparent;
+  border: 1px solid var(--neon-cyan);
+  color: var(--neon-cyan);
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  transition: all 0.3s ease;
+}
+
+.import-btn:hover,
+.create-btn:hover {
+  background: rgba(0, 255, 255, 0.1);
+  box-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
+}
+
+.create-btn {
+  background: linear-gradient(135deg, var(--neon-purple), var(--neon-cyan));
+  border: none;
+  color: white;
+  font-weight: 600;
+}
+
+.create-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(138, 43, 226, 0.4);
+}
+
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  background: rgba(0, 0, 0, 0.3);
+  border: 2px dashed rgba(0, 255, 255, 0.3);
+  border-radius: 8px;
+}
+
+.empty-state p {
+  margin: 10px 0;
+  color: var(--text-muted);
+}
+
+.empty-state button {
+  margin-top: 20px;
+}
+
+.scenarios-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 20px;
+}
+
+@media (max-width: 768px) {
+  .scenarios-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .manager-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 15px;
+  }
+
+  .manager-actions {
+    width: 100%;
+  }
+
+  .import-btn,
+  .create-btn {
+    flex: 1;
+  }
+}

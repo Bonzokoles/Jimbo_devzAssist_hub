@@ -1,7 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { FiSend, FiZap } from 'react-icons/fi';
+import { FiSend, FiZap, FiCheckCircle } from 'react-icons/fi';
 import useStore from '../store/useStore';
 import { callAI } from '../utils/aiClient';
+import { runMOA, isMOAConfigured, MOA_STRATEGIES } from '../utils/moa/moaEngine';
 import { OPENROUTER_MODELS } from '../utils/providers/openrouter';
 import { GEMINI_MODELS } from '../utils/providers/gemini';
 import { MISTRAL_MODELS } from '../utils/providers/mistral';
@@ -14,7 +15,8 @@ import './AIAssistant.css';
 const AIAssistant = () => {
   const { 
     openaiKey, claudeKey, openrouterKey, geminiKey, mistralKey, cohereKey, ollamaUrl,
-    toggleSettings, currentFileContent 
+    toggleSettings, currentFileContent,
+    moaEnabled, moaConfig, setMOAEnabled
   } = useStore();
   const [provider, setProvider] = useState('openai');
   const [model, setModel] = useState('gpt-3.5-turbo');
@@ -25,6 +27,7 @@ const AIAssistant = () => {
   const messagesEndRef = useRef(null);
   const [skills, setSkills] = useState([]);
   const [showSkillsMenu, setShowSkillsMenu] = useState(false);
+  const [useMOA, setUseMOA] = useState(false);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -108,7 +111,12 @@ const AIAssistant = () => {
   }, [provider]);
 
   const handleSend = async () => {
-    if (!input.trim() || !hasApiKey) return;
+    if (!input.trim()) return;
+    
+    // Check if MOA is enabled and configured
+    const shouldUseMOA = useMOA && moaConfig && isMOAConfigured(moaConfig);
+    
+    if (!shouldUseMOA && !hasApiKey) return;
 
     const userMessage = {
       role: 'user',
@@ -121,29 +129,79 @@ const AIAssistant = () => {
     setError(null);
 
     try {
-      const chatMessages = [...messages, userMessage];
-      const currentApiKey = getCurrentApiKey();
-      
-      const response = await callAI(
-        provider,
-        currentApiKey,
-        model,
-        chatMessages,
-        provider === 'ollama' ? ollamaUrl : null
-      );
+      if (shouldUseMOA) {
+        // Use MOA
+        const moaResult = await runMOA(input.trim(), moaConfig);
+        
+        const assistantMessage = {
+          role: 'assistant',
+          content: formatMOAResponse(moaResult, moaConfig.strategy),
+          moaResult,
+          isMOA: true,
+        };
 
-      const assistantMessage = {
-        role: 'assistant',
-        content: response,
-      };
+        setMessages((prev) => [...prev, assistantMessage]);
+      } else {
+        // Use regular AI
+        const chatMessages = [...messages, userMessage];
+        const currentApiKey = getCurrentApiKey();
+        
+        const response = await callAI(
+          provider,
+          currentApiKey,
+          model,
+          chatMessages,
+          provider === 'ollama' ? ollamaUrl : null
+        );
 
-      setMessages((prev) => [...prev, assistantMessage]);
+        const assistantMessage = {
+          role: 'assistant',
+          content: response,
+        };
+
+        setMessages((prev) => [...prev, assistantMessage]);
+      }
     } catch (err) {
       console.error('AI API Error:', err);
       setError('Failed to get response: ' + err.toString());
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const formatMOAResponse = (result, strategy) => {
+    if (strategy === MOA_STRATEGIES.VOTING) {
+      if (result.aggregatedResponse) {
+        return result.aggregatedResponse;
+      }
+      // Fallback if aggregation failed
+      return result.originalResponses
+        .filter(r => r.success)
+        .map((r, i) => `**Model ${i + 1}** (${r.provider} - ${r.model}):\n${r.response}`)
+        .join('\n\n---\n\n');
+    }
+    
+    if (strategy === MOA_STRATEGIES.SEQUENTIAL) {
+      // Return the last (most refined) response
+      const lastResponse = result.filter(r => r.success).pop();
+      return lastResponse ? lastResponse.response : 'No successful responses';
+    }
+    
+    if (strategy === MOA_STRATEGIES.PARALLEL) {
+      return result
+        .filter(r => r.success)
+        .map((r, i) => `**Model ${i + 1}** (${r.provider} - ${r.model}):\n${r.response}`)
+        .join('\n\n---\n\n');
+    }
+    
+    if (strategy === MOA_STRATEGIES.SPECIALIZED) {
+      return Object.entries(result)
+        .filter(([_, r]) => r.success)
+        .map(([role, r]) => `**${role.toUpperCase()}**:\n${r.response}`)
+        .join('\n\n---\n\n');
+    }
+    
+    return 'Unknown strategy result';
   };
 
   const handleQuickAction = (action) => {
@@ -203,7 +261,10 @@ const AIAssistant = () => {
     return names[provider] || provider;
   };
 
-  if (!hasApiKey) {
+  // Check if we can use MOA
+  const canUseMOA = moaConfig && isMOAConfigured(moaConfig);
+
+  if (!hasApiKey && !canUseMOA) {
     return (
       <div className="ai-assistant">
         <div className="ai-header">
@@ -232,32 +293,55 @@ const AIAssistant = () => {
           <FiZap />
           AI Assistant
         </h2>
-        <div className="ai-provider-selector">
-          <select 
-            className="provider-select"
-            value={provider}
-            onChange={(e) => setProvider(e.target.value)}
-          >
-            <option value="openai" disabled={!openaiKey}>OpenAI</option>
-            <option value="claude" disabled={!claudeKey}>Claude</option>
-            <option value="openrouter" disabled={!openrouterKey}>OpenRouter</option>
-            <option value="gemini" disabled={!geminiKey}>Google Gemini</option>
-            <option value="mistral" disabled={!mistralKey}>Mistral AI</option>
-            <option value="cohere" disabled={!cohereKey}>Cohere</option>
-            <option value="ollama">Ollama (Local)</option>
-          </select>
-          <select 
-            className="model-select"
-            value={model}
-            onChange={(e) => setModel(e.target.value)}
-          >
-            {getModelOptions().map((modelOption) => (
-              <option key={modelOption.id} value={modelOption.id}>
-                {modelOption.name}
-              </option>
-            ))}
-          </select>
-        </div>
+        
+        {/* MOA Toggle */}
+        {canUseMOA && (
+          <div className="moa-toggle-wrapper">
+            <label className="moa-toggle-label">
+              <input
+                type="checkbox"
+                checked={useMOA}
+                onChange={(e) => setUseMOA(e.target.checked)}
+                className="moa-checkbox"
+              />
+              <span className="moa-toggle-text">Use MOA Mode</span>
+            </label>
+          </div>
+        )}
+
+        {useMOA && canUseMOA ? (
+          <div className="moa-active-indicator">
+            <FiCheckCircle />
+            <span>MOA Active: {moaConfig.strategy}</span>
+          </div>
+        ) : (
+          <div className="ai-provider-selector">
+            <select 
+              className="provider-select"
+              value={provider}
+              onChange={(e) => setProvider(e.target.value)}
+            >
+              <option value="openai" disabled={!openaiKey}>OpenAI</option>
+              <option value="claude" disabled={!claudeKey}>Claude</option>
+              <option value="openrouter" disabled={!openrouterKey}>OpenRouter</option>
+              <option value="gemini" disabled={!geminiKey}>Google Gemini</option>
+              <option value="mistral" disabled={!mistralKey}>Mistral AI</option>
+              <option value="cohere" disabled={!cohereKey}>Cohere</option>
+              <option value="ollama">Ollama (Local)</option>
+            </select>
+            <select 
+              className="model-select"
+              value={model}
+              onChange={(e) => setModel(e.target.value)}
+            >
+              {getModelOptions().map((modelOption) => (
+                <option key={modelOption.id} value={modelOption.id}>
+                  {modelOption.name}
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
       </div>
 
       <div className="ai-messages">
@@ -269,8 +353,11 @@ const AIAssistant = () => {
         )}
 
         {messages.map((msg, index) => (
-          <div key={index} className={`message ${msg.role}`}>
-            <div className="message-role">{msg.role}</div>
+          <div key={index} className={`message ${msg.role} ${msg.isMOA ? 'moa-message' : ''}`}>
+            <div className="message-role">
+              {msg.role}
+              {msg.isMOA && <span className="moa-badge">MOA</span>}
+            </div>
             <div className="message-content">{msg.content}</div>
           </div>
         ))}
@@ -360,7 +447,7 @@ const AIAssistant = () => {
           <button
             className="send-btn"
             onClick={handleSend}
-            disabled={!input.trim() || isLoading}
+            disabled={!input.trim() || isLoading || (!hasApiKey && !useMOA)}
           >
             <FiSend />
           </button>

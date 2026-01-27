@@ -9,6 +9,7 @@ import { MISTRAL_MODELS, testMistralConnection } from '../utils/providers/mistra
 import { COHERE_MODELS, testCohereConnection } from '../utils/providers/cohere';
 import { DEFAULT_OLLAMA_MODELS, testOllamaConnection, getOllamaModels } from '../utils/providers/ollama';
 import SkillsManager from './SkillsManager';
+import MOAPanel from './MOAPanel';
 import './Settings.css';
 
 const Settings = () => {
@@ -349,6 +350,12 @@ const Settings = () => {
               onClick={() => setActiveTab('skills')}
             >
               Skills
+            </button>
+            <button
+              className={`tab-btn ${activeTab === 'moa' ? 'active' : ''}`}
+              onClick={() => setActiveTab('moa')}
+            >
+              MOA
             </button>
             <button
               className={`tab-btn ${activeTab === 'appearance' ? 'active' : ''}`}
@@ -724,6 +731,12 @@ const Settings = () => {
           {activeTab === 'skills' && (
             <div className="settings-section">
               <SkillsManager inSettingsModal={true} onUseSkill={() => {}} />
+            </div>
+          )}
+
+          {activeTab === 'moa' && (
+            <div className="settings-section">
+              <MOAPanel />
             </div>
           )}
 

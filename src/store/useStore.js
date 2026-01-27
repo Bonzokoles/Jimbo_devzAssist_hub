@@ -53,6 +53,12 @@ const useStore = create((set) => ({
     linesOfCode: 45782,
     gitCommits: 892,
   },
+
+  // MOA Configuration
+  moaEnabled: false,
+  moaConfig: null,
+  setMOAEnabled: (enabled) => set({ moaEnabled: enabled }),
+  setMOAConfig: (config) => set({ moaConfig: config }),
 }));
 
 export default useStore;

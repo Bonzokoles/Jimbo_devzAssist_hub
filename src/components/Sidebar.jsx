@@ -5,7 +5,8 @@ import {
   FiActivity, 
   FiZap, 
   FiTerminal, 
-  FiSettings 
+  FiSettings,
+  FiPackage
 } from 'react-icons/fi';
 import useStore from '../store/useStore';
 import './Sidebar.css';
@@ -16,6 +17,7 @@ const Sidebar = () => {
   const menuItems = [
     { id: 'dashboard', icon: FiHome, label: 'Dashboard' },
     { id: 'editor', icon: FiCode, label: 'Code Editor' },
+    { id: 'libraries', icon: FiPackage, label: 'Libraries' },
     { id: 'monitor', icon: FiActivity, label: 'System Monitor' },
     { id: 'integrations', icon: FiZap, label: 'Integrations' },
     { id: 'terminal', icon: FiTerminal, label: 'Terminal' },

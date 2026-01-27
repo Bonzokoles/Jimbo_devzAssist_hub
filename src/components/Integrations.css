@@ -1,0 +1,104 @@
+.integrations {
+  padding: 30px;
+  height: calc(100vh - 70px);
+  overflow-y: auto;
+}
+
+.integrations h2 {
+  font-size: 24px;
+  color: var(--neon-green);
+  margin-bottom: 30px;
+}
+
+.integrations-grid {
+  display: grid;
+  gap: 20px;
+}
+
+.integration-card {
+  background: var(--glass-bg);
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--glass-border);
+  border-radius: 12px;
+  padding: 25px;
+  transition: all 0.3s ease;
+}
+
+.integration-card:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.integration-header {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.integration-icon {
+  width: 50px;
+  height: 50px;
+  border-radius: 8px;
+  background: rgba(0, 255, 65, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  color: var(--neon-green);
+}
+
+.integration-info h3 {
+  font-size: 20px;
+  margin-bottom: 5px;
+}
+
+.integration-info p {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.integration-form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.integration-form .form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.integration-form label {
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.integration-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 15px;
+}
+
+.connection-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.connection-badge.connected {
+  background: rgba(0, 255, 65, 0.2);
+  color: var(--neon-green);
+}
+
+.connection-badge.disconnected {
+  background: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.5);
+}

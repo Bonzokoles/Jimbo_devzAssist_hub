@@ -5,6 +5,7 @@ import { saveAPIKey, getAPIKey } from '../utils/tauriCommands';
 import { testOpenAIConnection, testClaudeConnection } from '../utils/aiClient';
 import PromptPresets from './PromptPresets';
 import WorkspacePrompt from './WorkspacePrompt';
+import ScenarioManager from './ScenarioManager';
 import { loadSystemPrompt, saveSystemPrompt, loadWorkspacePrompt, saveWorkspacePrompt } from '../utils/prompts/promptStorage';
 import './Settings.css';
 
@@ -175,6 +176,12 @@ const Settings = () => {
               Workspace
             </button>
             <button
+              className={`tab-btn ${activeTab === 'moa' ? 'active' : ''}`}
+              onClick={() => setActiveTab('moa')}
+            >
+              MOA Scenarios
+            </button>
+            <button
               className={`tab-btn ${activeTab === 'ai' ? 'active' : ''}`}
               onClick={() => setActiveTab('ai')}
             >
@@ -255,6 +262,12 @@ const Settings = () => {
                   No project selected. Please select a project to configure workspace prompt.
                 </div>
               )}
+            </div>
+          )}
+
+          {activeTab === 'moa' && (
+            <div className="settings-section">
+              <ScenarioManager />
             </div>
           )}
 

@@ -9,7 +9,9 @@ import SystemMonitor from './components/SystemMonitor';
 import Integrations from './components/Integrations';
 import AIAssistant from './components/AIAssistant';
 import Settings from './components/Settings';
+import PromptEditor from './components/PromptEditor';
 import useStore from './store/useStore';
+import { saveSystemPrompt, saveWorkspacePrompt } from './utils/prompts/promptStorage';
 import './App.css';
 
 const TerminalView = () => (
@@ -24,7 +26,39 @@ const TerminalView = () => (
 );
 
 function App() {
-  const { currentView, aiPanelOpen } = useStore();
+  const { 
+    currentView, 
+    aiPanelOpen, 
+    promptEditorOpen, 
+    promptEditorType,
+    togglePromptEditor,
+    systemPrompt,
+    workspacePrompt,
+    setSystemPrompt,
+    setWorkspacePrompt,
+    currentProjectPath
+  } = useStore();
+
+  const handleSavePrompt = async (prompt) => {
+    if (promptEditorType === 'system') {
+      await saveSystemPrompt(prompt);
+      setSystemPrompt(prompt);
+    } else if (promptEditorType === 'workspace') {
+      if (!currentProjectPath) {
+        throw new Error('No project path set. Please set a project path first.');
+      }
+      await saveWorkspacePrompt(currentProjectPath, prompt);
+      setWorkspacePrompt(prompt);
+    }
+  };
+
+  const getPromptEditorTitle = () => {
+    return promptEditorType === 'system' ? 'Edit System Prompt' : 'Edit Workspace Prompt';
+  };
+
+  const getPromptEditorInitial = () => {
+    return promptEditorType === 'system' ? systemPrompt : workspacePrompt;
+  };
 
   const renderView = () => {
     switch (currentView) {
@@ -62,6 +96,17 @@ function App() {
       </div>
 
       <Settings />
+
+      <PromptEditor
+        isOpen={promptEditorOpen}
+        onClose={() => togglePromptEditor()}
+        initialPrompt={getPromptEditorInitial()}
+        onSave={handleSavePrompt}
+        title={getPromptEditorTitle()}
+        placeholder={promptEditorType === 'system' 
+          ? 'Enter your system prompt that defines AI behavior...' 
+          : 'Describe your project context, tech stack, and conventions...'}
+      />
     </div>
   );
 }

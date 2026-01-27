@@ -1,0 +1,151 @@
+.prompt-presets {
+  margin-top: 20px;
+}
+
+.presets-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.presets-header h4 {
+  margin: 0;
+  color: var(--neon-cyan);
+}
+
+.save-preset-btn {
+  background: transparent;
+  border: 1px solid var(--neon-purple);
+  color: var(--neon-purple);
+  padding: 6px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  transition: all 0.3s ease;
+}
+
+.save-preset-btn:hover {
+  background: rgba(138, 43, 226, 0.1);
+  box-shadow: 0 0 10px rgba(138, 43, 226, 0.3);
+}
+
+.save-preset-dialog {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 15px;
+  padding: 10px;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid var(--neon-purple);
+  border-radius: 4px;
+}
+
+.save-preset-dialog input {
+  flex: 1;
+  background: rgba(0, 0, 0, 0.5);
+  border: 1px solid var(--neon-cyan);
+  border-radius: 4px;
+  color: var(--text-light);
+  padding: 8px;
+  outline: none;
+}
+
+.save-preset-dialog input:focus {
+  border-color: var(--neon-purple);
+}
+
+.save-preset-dialog button {
+  background: var(--neon-purple);
+  border: none;
+  color: white;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.3s ease;
+}
+
+.save-preset-dialog button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(138, 43, 226, 0.4);
+}
+
+.presets-section {
+  margin-bottom: 20px;
+}
+
+.presets-section h5 {
+  margin: 0 0 10px 0;
+  color: var(--text-muted);
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.presets-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.preset-item {
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(0, 255, 255, 0.3);
+  border-radius: 4px;
+  padding: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.preset-item:hover {
+  border-color: var(--neon-cyan);
+  background: rgba(0, 255, 255, 0.05);
+}
+
+.preset-item.selected {
+  border-color: var(--neon-purple);
+  background: rgba(138, 43, 226, 0.1);
+}
+
+.preset-content {
+  flex: 1;
+}
+
+.preset-name {
+  color: var(--neon-cyan);
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.preset-preview {
+  color: var(--text-muted);
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.delete-preset-btn {
+  background: transparent;
+  border: 1px solid rgba(255, 69, 69, 0.5);
+  color: rgba(255, 69, 69, 0.8);
+  padding: 6px;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  transition: all 0.3s ease;
+  margin-left: 10px;
+}
+
+.delete-preset-btn:hover {
+  border-color: rgb(255, 69, 69);
+  color: rgb(255, 69, 69);
+  background: rgba(255, 69, 69, 0.1);
+}

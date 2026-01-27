@@ -1,0 +1,139 @@
+.moa-model-config {
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid var(--neon-cyan);
+  border-radius: 8px;
+  margin-bottom: 15px;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.moa-model-config:hover {
+  border-color: var(--neon-purple);
+  box-shadow: 0 0 15px rgba(138, 43, 226, 0.2);
+}
+
+.model-config-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px;
+  background: rgba(0, 255, 255, 0.05);
+  border-bottom: 1px solid rgba(0, 255, 255, 0.2);
+  cursor: pointer;
+}
+
+.model-info {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.model-number {
+  color: var(--neon-cyan);
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.model-role {
+  color: var(--text-light);
+  font-size: 14px;
+}
+
+.model-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.toggle-btn,
+.remove-btn {
+  background: transparent;
+  border: 1px solid currentColor;
+  color: var(--neon-cyan);
+  padding: 6px;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+}
+
+.toggle-btn:hover {
+  background: rgba(0, 255, 255, 0.1);
+}
+
+.remove-btn {
+  color: rgba(255, 69, 69, 0.8);
+  border-color: rgba(255, 69, 69, 0.5);
+}
+
+.remove-btn:hover {
+  background: rgba(255, 69, 69, 0.1);
+  border-color: rgb(255, 69, 69);
+  color: rgb(255, 69, 69);
+}
+
+.model-config-content {
+  padding: 20px;
+}
+
+.form-row {
+  margin-bottom: 15px;
+}
+
+.form-row.two-columns {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group label {
+  margin-bottom: 8px;
+  color: var(--neon-cyan);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+  background: rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(0, 255, 255, 0.3);
+  border-radius: 4px;
+  color: var(--text-light);
+  padding: 10px;
+  outline: none;
+  transition: all 0.3s ease;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+  border-color: var(--neon-purple);
+  box-shadow: 0 0 10px rgba(138, 43, 226, 0.3);
+}
+
+.form-group textarea {
+  font-family: 'Courier New', monospace;
+  font-size: 13px;
+  line-height: 1.6;
+  resize: vertical;
+}
+
+.character-count {
+  margin-top: 5px;
+  text-align: right;
+  color: var(--text-muted);
+  font-size: 11px;
+}
+
+.help-text {
+  margin-top: 5px;
+  color: var(--text-muted);
+  font-size: 11px;
+}

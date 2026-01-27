@@ -1,6 +1,8 @@
 // Prevents additional console window on Windows in release
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
+mod prompts;
+
 use serde::{Deserialize, Serialize};
 use std::fs;
 use std::path::Path;
@@ -205,6 +207,16 @@ fn main() {
             get_api_key,
             read_file_content,
             write_file_content,
+            prompts::save_system_prompt,
+            prompts::load_system_prompt,
+            prompts::save_workspace_prompt,
+            prompts::load_workspace_prompt,
+            prompts::save_prompt_preset,
+            prompts::load_prompt_presets,
+            prompts::delete_prompt_preset,
+            prompts::save_moa_scenario,
+            prompts::load_moa_scenarios,
+            prompts::delete_moa_scenario,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

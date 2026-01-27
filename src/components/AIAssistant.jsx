@@ -1,16 +1,35 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { FiSend, FiZap } from 'react-icons/fi';
+import { FiSend, FiZap, FiEdit2 } from 'react-icons/fi';
 import useStore from '../store/useStore';
 import { callOpenAI, callClaude } from '../utils/aiClient';
+import { loadMOAScenarios } from '../utils/moa/scenarioStorage';
+import { runMOAScenario } from '../utils/moa/scenarioRunner';
+import { loadSystemPrompt, loadWorkspacePrompt } from '../utils/prompts/promptStorage';
 import './AIAssistant.css';
 
 const AIAssistant = () => {
-  const { openaiKey, claudeKey, toggleSettings, currentFileContent } = useStore();
+  const { 
+    openaiKey, 
+    claudeKey, 
+    toggleSettings, 
+    currentFileContent,
+    moaMode,
+    selectedScenario,
+    setMOAMode,
+    setSelectedScenario,
+    togglePromptEditor,
+    currentProjectPath
+  } = useStore();
   const [provider, setProvider] = useState('openai');
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [moaScenarios, setMoaScenarios] = useState([]);
+  const [moaResults, setMoaResults] = useState(null);
+  const [showMOAResults, setShowMOAResults] = useState(false);
+  const [systemPromptPreview, setSystemPromptPreview] = useState('');
+  const [workspacePromptPreview, setWorkspacePromptPreview] = useState('');
   const messagesEndRef = useRef(null);
 
   const scrollToBottom = () => {
@@ -21,7 +40,73 @@ const AIAssistant = () => {
     scrollToBottom();
   }, [messages, isLoading]);
 
+  useEffect(() => {
+    const loadScenarios = async () => {
+      try {
+        const scenarios = await loadMOAScenarios();
+        setMoaScenarios(scenarios);
+      } catch (err) {
+        console.error('Failed to load MOA scenarios:', err);
+      }
+    };
+    loadScenarios();
+  }, []);
+
+  useEffect(() => {
+    const loadPrompts = async () => {
+      try {
+        const systemPrompt = await loadSystemPrompt();
+        setSystemPromptPreview(systemPrompt);
+      } catch (err) {
+        console.error('Failed to load system prompt:', err);
+      }
+    };
+    loadPrompts();
+  }, []);
+
+  useEffect(() => {
+    const loadWorkspace = async () => {
+      if (currentProjectPath) {
+        try {
+          const workspacePrompt = await loadWorkspacePrompt(currentProjectPath);
+          setWorkspacePromptPreview(workspacePrompt);
+        } catch (err) {
+          console.error('Failed to load workspace prompt:', err);
+        }
+      }
+    };
+    loadWorkspace();
+  }, [currentProjectPath]);
+
   const hasApiKey = provider === 'openai' ? openaiKey : claudeKey;
+
+  const copyToClipboard = async (text) => {
+    try {
+      await navigator.clipboard.writeText(text);
+    } catch (error) {
+      console.error('Clipboard API failed:', error);
+      // Fallback for older browsers
+      try {
+        const textArea = document.createElement('textarea');
+        textArea.value = text;
+        textArea.style.position = 'fixed';
+        textArea.style.left = '-9999px';
+        document.body.appendChild(textArea);
+        textArea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textArea);
+      } catch (fallbackError) {
+        console.error('Fallback copy failed:', fallbackError);
+        alert('Failed to copy to clipboard');
+      }
+    }
+  };
+
+  const handleScenarioSelect = (e) => {
+    const scenarioName = e.target.value;
+    const scenario = moaScenarios.find(s => s.name === scenarioName);
+    setSelectedScenario(scenario || null);
+  };
 
   const handleSend = async () => {
     if (!input.trim() || !hasApiKey) return;
@@ -37,29 +122,49 @@ const AIAssistant = () => {
     setError(null);
 
     try {
-      const chatMessages = [...messages, userMessage];
-      let response;
-
-      if (provider === 'openai') {
-        response = await callOpenAI(
-          openaiKey,
-          'gpt-3.5-turbo',
-          chatMessages
+      if (moaMode && selectedScenario) {
+        // MOA Mode - use scenario runner
+        const results = await runMOAScenario(
+          selectedScenario,
+          userMessage.content,
+          { openai: openaiKey, claude: claudeKey }
         );
+        
+        setMoaResults(results);
+        setShowMOAResults(true);
+
+        // Add aggregated result to messages if available
+        const aggregatedMessage = {
+          role: 'assistant',
+          content: results.aggregated || 'MOA processing complete. See results panel below.',
+        };
+        setMessages((prev) => [...prev, aggregatedMessage]);
       } else {
-        response = await callClaude(
-          claudeKey,
-          'claude-3-sonnet-20240229',
-          chatMessages
-        );
+        // Normal mode
+        const chatMessages = [...messages, userMessage];
+        let response;
+
+        if (provider === 'openai') {
+          response = await callOpenAI(
+            openaiKey,
+            'gpt-3.5-turbo',
+            chatMessages
+          );
+        } else {
+          response = await callClaude(
+            claudeKey,
+            'claude-3-sonnet-20240229',
+            chatMessages
+          );
+        }
+
+        const assistantMessage = {
+          role: 'assistant',
+          content: response,
+        };
+
+        setMessages((prev) => [...prev, assistantMessage]);
       }
-
-      const assistantMessage = {
-        role: 'assistant',
-        content: response,
-      };
-
-      setMessages((prev) => [...prev, assistantMessage]);
     } catch (err) {
       console.error('AI API Error:', err);
       setError('Failed to get response: ' + err.toString());
@@ -128,6 +233,22 @@ const AIAssistant = () => {
           <FiZap />
           AI Assistant
         </h2>
+        <div className="prompt-controls">
+          <button 
+            className="prompt-edit-btn" 
+            onClick={() => togglePromptEditor('system')}
+            title="Edit System Prompt"
+          >
+            <FiEdit2 /> System
+          </button>
+          <button 
+            className="prompt-edit-btn" 
+            onClick={() => togglePromptEditor('workspace')}
+            title="Edit Workspace Prompt"
+          >
+            <FiEdit2 /> Workspace
+          </button>
+        </div>
         <div className="ai-provider-selector">
           <button
             className={`provider-btn ${provider === 'openai' ? 'active' : ''}`}
@@ -144,6 +265,29 @@ const AIAssistant = () => {
             Claude
           </button>
         </div>
+      </div>
+
+      <div className="moa-mode-section">
+        <label className="moa-mode-label">
+          <input 
+            type="checkbox" 
+            checked={moaMode} 
+            onChange={(e) => setMOAMode(e.target.checked)} 
+          />
+          <span>MOA Mode</span>
+        </label>
+        {moaMode && (
+          <select 
+            className="scenario-selector"
+            value={selectedScenario?.name || ''} 
+            onChange={handleScenarioSelect}
+          >
+            <option value="">-- Select Scenario --</option>
+            {moaScenarios.map((s, i) => (
+              <option key={i} value={s.name}>{s.name}</option>
+            ))}
+          </select>
+        )}
       </div>
 
       <div className="ai-messages">
@@ -177,6 +321,58 @@ const AIAssistant = () => {
 
         <div ref={messagesEndRef} />
       </div>
+
+      {showMOAResults && moaResults && (
+        <div className="moa-results">
+          <div className="moa-results-header">
+            <h3>MOA Results</h3>
+            <button 
+              className="close-results-btn"
+              onClick={() => setShowMOAResults(false)}
+            >
+              ✕
+            </button>
+          </div>
+          
+          {moaResults.responses && moaResults.responses.length > 0 && (
+            <div className="moa-individual-responses">
+              <h4>Individual Model Responses</h4>
+              {moaResults.responses.map((resp, idx) => (
+                <div key={idx} className="moa-response-item">
+                  <div className="moa-response-header">
+                    <span className="moa-model-name">{resp.model}</span>
+                    <button 
+                      className="copy-btn"
+                      onClick={() => copyToClipboard(resp.response)}
+                      title="Copy response"
+                    >
+                      📋
+                    </button>
+                  </div>
+                  <div className="moa-response-content">
+                    {resp.response}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {moaResults.aggregated && (
+            <div className="moa-aggregated-response">
+              <h4>Aggregated Response</h4>
+              <div className="moa-response-content">
+                {moaResults.aggregated}
+              </div>
+              <button 
+                className="copy-btn"
+                onClick={() => copyToClipboard(moaResults.aggregated)}
+              >
+                📋 Copy Aggregated
+              </button>
+            </div>
+          )}
+        </div>
+      )}
 
       <div className="ai-quick-actions">
         <button className="quick-action-btn" onClick={() => handleQuickAction('explain')}>

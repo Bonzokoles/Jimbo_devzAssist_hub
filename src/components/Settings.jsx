@@ -3,11 +3,15 @@ import { FiSettings, FiX, FiEye, FiEyeOff, FiCheck, FiAlertCircle } from 'react-
 import useStore from '../store/useStore';
 import { saveAPIKey, getAPIKey } from '../utils/tauriCommands';
 import { testOpenAIConnection, testClaudeConnection } from '../utils/aiClient';
+import PromptPresets from './PromptPresets';
+import WorkspacePrompt from './WorkspacePrompt';
+import ScenarioManager from './ScenarioManager';
+import { loadSystemPrompt, saveSystemPrompt, loadWorkspacePrompt, saveWorkspacePrompt } from '../utils/prompts/promptStorage';
 import './Settings.css';
 
 const Settings = () => {
-  const { settingsOpen, toggleSettings, setOpenAIKey, setClaudeKey } = useStore();
-  const [activeTab, setActiveTab] = useState('ai');
+  const { settingsOpen, toggleSettings, setOpenAIKey, setClaudeKey, currentProjectPath } = useStore();
+  const [activeTab, setActiveTab] = useState('system-prompt');
   
   // OpenAI
   const [openaiKeyInput, setOpenaiKeyInput] = useState('');
@@ -22,10 +26,15 @@ const Settings = () => {
   const [showClaudeKey, setShowClaudeKey] = useState(false);
   const [claudeTestStatus, setClaudeTestStatus] = useState(null);
   const [testingClaude, setTestingClaude] = useState(false);
+  
+  // Prompts
+  const [systemPrompt, setSystemPrompt] = useState('');
+  const [workspacePrompt, setWorkspacePrompt] = useState('');
 
   useEffect(() => {
     if (settingsOpen) {
       loadApiKeys();
+      loadPrompts();
     }
   }, [settingsOpen]);
 
@@ -44,6 +53,24 @@ const Settings = () => {
       }
     } catch (error) {
       console.error('Failed to load API keys:', error);
+    }
+  };
+
+  const loadPrompts = async () => {
+    try {
+      const sysPrompt = await loadSystemPrompt();
+      if (sysPrompt) {
+        setSystemPrompt(sysPrompt);
+      }
+      
+      if (currentProjectPath) {
+        const wsPrompt = await loadWorkspacePrompt(currentProjectPath);
+        if (wsPrompt) {
+          setWorkspacePrompt(wsPrompt);
+        }
+      }
+    } catch (error) {
+      console.error('Failed to load prompts:', error);
     }
   };
 
@@ -104,6 +131,13 @@ const Settings = () => {
         setClaudeKey(claudeKeyInput);
       }
       
+      // Save prompts
+      await saveSystemPrompt(systemPrompt);
+      
+      if (currentProjectPath && workspacePrompt) {
+        await saveWorkspacePrompt(currentProjectPath, workspacePrompt);
+      }
+      
       alert('Settings saved successfully!');
       toggleSettings();
     } catch (error) {
@@ -130,6 +164,24 @@ const Settings = () => {
         <div className="settings-content">
           <div className="settings-tabs">
             <button
+              className={`tab-btn ${activeTab === 'system-prompt' ? 'active' : ''}`}
+              onClick={() => setActiveTab('system-prompt')}
+            >
+              System Prompt
+            </button>
+            <button
+              className={`tab-btn ${activeTab === 'workspace' ? 'active' : ''}`}
+              onClick={() => setActiveTab('workspace')}
+            >
+              Workspace
+            </button>
+            <button
+              className={`tab-btn ${activeTab === 'moa' ? 'active' : ''}`}
+              onClick={() => setActiveTab('moa')}
+            >
+              MOA Scenarios
+            </button>
+            <button
               className={`tab-btn ${activeTab === 'ai' ? 'active' : ''}`}
               onClick={() => setActiveTab('ai')}
             >
@@ -148,6 +200,77 @@ const Settings = () => {
               System
             </button>
           </div>
+
+          {activeTab === 'system-prompt' && (
+            <div className="settings-section">
+              <h3>System Prompt</h3>
+              <p style={{ marginBottom: '15px', color: 'var(--text-secondary)' }}>
+                Configure the system prompt that defines the AI assistant's behavior and capabilities.
+              </p>
+              
+              <PromptPresets onSelectPreset={setSystemPrompt} />
+              
+              <div className="form-group" style={{ marginTop: '20px' }}>
+                <label>System Prompt</label>
+                <textarea
+                  value={systemPrompt}
+                  onChange={(e) => setSystemPrompt(e.target.value)}
+                  placeholder="Enter your system prompt here..."
+                  style={{
+                    width: '100%',
+                    minHeight: '300px',
+                    padding: '12px',
+                    fontFamily: 'monospace',
+                    fontSize: '13px',
+                    lineHeight: '1.5',
+                    resize: 'vertical'
+                  }}
+                />
+                <div style={{ 
+                  marginTop: '8px', 
+                  fontSize: '12px', 
+                  color: 'var(--text-secondary)',
+                  textAlign: 'right' 
+                }}>
+                  {systemPrompt.length} characters
+                </div>
+              </div>
+            </div>
+          )}
+
+          {activeTab === 'workspace' && (
+            <div className="settings-section">
+              <h3>Workspace Prompt</h3>
+              <p style={{ marginBottom: '15px', color: 'var(--text-secondary)' }}>
+                Add project-specific context and guidelines for the current workspace.
+              </p>
+              
+              {currentProjectPath ? (
+                <WorkspacePrompt 
+                  projectPath={currentProjectPath}
+                  prompt={workspacePrompt}
+                  onPromptChange={setWorkspacePrompt}
+                  onProjectPathChange={() => {}}
+                />
+              ) : (
+                <div style={{ 
+                  padding: '20px', 
+                  textAlign: 'center', 
+                  color: 'var(--text-secondary)',
+                  background: 'rgba(255, 255, 255, 0.05)',
+                  borderRadius: '8px'
+                }}>
+                  No project selected. Please select a project to configure workspace prompt.
+                </div>
+              )}
+            </div>
+          )}
+
+          {activeTab === 'moa' && (
+            <div className="settings-section">
+              <ScenarioManager />
+            </div>
+          )}
 
           {activeTab === 'ai' && (
             <div>

@@ -43,6 +43,30 @@ const useStore = create((set) => ({
     linesOfCode: 45782,
     gitCommits: 892,
   },
+  
+  // Prompts
+  systemPrompt: '',
+  workspacePrompt: '',
+  currentProjectPath: '',
+  setSystemPrompt: (prompt) => set({ systemPrompt: prompt }),
+  setWorkspacePrompt: (prompt) => set({ workspacePrompt: prompt }),
+  setCurrentProjectPath: (path) => set({ currentProjectPath: path }),
+  
+  // MOA
+  moaMode: false,
+  selectedScenario: null,
+  moaScenarios: [],
+  setMOAMode: (enabled) => set({ moaMode: enabled }),
+  setSelectedScenario: (scenario) => set({ selectedScenario: scenario }),
+  setMOAScenarios: (scenarios) => set({ moaScenarios: scenarios }),
+  
+  // Prompt Editor Modal
+  promptEditorOpen: false,
+  promptEditorType: 'system', // 'system' or 'workspace'
+  togglePromptEditor: (type) => set((state) => ({ 
+    promptEditorOpen: !state.promptEditorOpen,
+    promptEditorType: type || state.promptEditorType
+  })),
 }));
 
 export default useStore;

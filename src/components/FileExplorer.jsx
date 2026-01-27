@@ -193,7 +193,7 @@ const FileExplorer = () => {
               <FileTreeNode
                 node={tree}
                 level={0}
-                expanded={expandedFolders.has(tree.path)}
+                expandedFolders={expandedFolders}
                 onToggle={toggleFolder}
                 onSelect={handleNodeSelect}
                 onContextMenu={handleContextMenu}

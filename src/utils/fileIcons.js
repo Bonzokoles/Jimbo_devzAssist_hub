@@ -1,7 +1,6 @@
 import { 
   FiFile, 
-  FiFolder, 
-  FiFolderOpen 
+  FiFolder
 } from 'react-icons/fi';
 import { 
   SiJavascript, 
@@ -14,7 +13,6 @@ import {
   SiMarkdown,
   SiTypescript,
   SiCplusplus,
-  SiJava,
   SiGo
 } from 'react-icons/si';
 
@@ -40,7 +38,7 @@ export const getFileIcon = (file) => {
     'c': SiCplusplus,
     'h': SiCplusplus,
     'hpp': SiCplusplus,
-    'java': SiJava,
+    'java': FiFile, // Use generic file icon for Java
     'go': SiGo,
     'toml': FiFile,
     'yaml': FiFile,
@@ -52,5 +50,5 @@ export const getFileIcon = (file) => {
 };
 
 export const getFolderIcon = (isOpen) => {
-  return isOpen ? FiFolderOpen : FiFolder;
+  return FiFolder; // Use same icon for open/closed folders
 };

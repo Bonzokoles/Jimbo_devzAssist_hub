@@ -6,15 +6,16 @@ import './FileTreeNode.css';
 const FileTreeNode = ({ 
   node, 
   level, 
-  expanded, 
+  expandedFolders,
   onToggle, 
   onSelect, 
   onContextMenu,
   selectedPath 
 }) => {
-  const Icon = node.is_dir ? getFolderIcon(expanded) : getFileIcon(node);
+  const Icon = node.is_dir ? getFolderIcon(expandedFolders.has(node.path)) : getFileIcon(node);
   const hasChildren = node.is_dir && node.children && node.children.length > 0;
   const isSelected = selectedPath === node.path;
+  const expanded = expandedFolders.has(node.path);
 
   const handleClick = (e) => {
     e.stopPropagation();
@@ -57,7 +58,7 @@ const FileTreeNode = ({
               key={child.path}
               node={child}
               level={level + 1}
-              expanded={expanded && child.is_dir}
+              expandedFolders={expandedFolders}
               onToggle={onToggle}
               onSelect={onSelect}
               onContextMenu={onContextMenu}

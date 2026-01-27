@@ -9,6 +9,8 @@ import { COHERE_MODELS } from '../utils/providers/cohere';
 import { DEFAULT_OLLAMA_MODELS } from '../utils/providers/ollama';
 import './MOAPanel.css';
 
+const MAX_MODELS = 5;
+
 const MOAPanel = () => {
   const { 
     moaEnabled, moaConfig, setMOAEnabled, setMOAConfig,
@@ -19,6 +21,7 @@ const MOAPanel = () => {
   const [models, setModels] = useState(moaConfig?.models || []);
   const [aggregatorConfig, setAggregatorConfig] = useState(moaConfig?.aggregatorConfig || null);
   const [agentRoles, setAgentRoles] = useState(moaConfig?.agentRoles || {});
+  const [statusMessage, setStatusMessage] = useState(null);
 
   // Load saved config on mount
   useEffect(() => {
@@ -73,8 +76,9 @@ const MOAPanel = () => {
   };
 
   const addModel = () => {
-    if (models.length >= 5) {
-      alert('Maximum 5 models allowed');
+    if (models.length >= MAX_MODELS) {
+      setStatusMessage({ type: 'error', text: `Maximum ${MAX_MODELS} models allowed` });
+      setTimeout(() => setStatusMessage(null), 3000);
       return;
     }
 
@@ -126,7 +130,8 @@ const MOAPanel = () => {
 
     // Validate config
     if (!isMOAConfigured(config)) {
-      alert('Please configure at least 2 models/agents');
+      setStatusMessage({ type: 'error', text: 'Please configure at least 2 models/agents' });
+      setTimeout(() => setStatusMessage(null), 3000);
       return;
     }
 
@@ -136,7 +141,8 @@ const MOAPanel = () => {
     // Save to store
     setMOAConfig(config);
     
-    alert('MOA configuration saved successfully!');
+    setStatusMessage({ type: 'success', text: 'MOA configuration saved successfully!' });
+    setTimeout(() => setStatusMessage(null), 3000);
   };
 
   const loadConfiguration = () => {
@@ -149,18 +155,22 @@ const MOAPanel = () => {
         setAggregatorConfig(parsed.aggregatorConfig || null);
         setAgentRoles(parsed.agentRoles || {});
         setMOAConfig(parsed);
-        alert('Configuration loaded successfully!');
+        setStatusMessage({ type: 'success', text: 'Configuration loaded successfully!' });
+        setTimeout(() => setStatusMessage(null), 3000);
       } catch (error) {
-        alert('Failed to load configuration: ' + error.message);
+        setStatusMessage({ type: 'error', text: 'Failed to load configuration: ' + error.message });
+        setTimeout(() => setStatusMessage(null), 3000);
       }
     } else {
-      alert('No saved configuration found');
+      setStatusMessage({ type: 'error', text: 'No saved configuration found' });
+      setTimeout(() => setStatusMessage(null), 3000);
     }
   };
 
   const addAgentRole = (role) => {
     if (agentRoles[role]) {
-      alert('Agent role already exists');
+      setStatusMessage({ type: 'error', text: 'Agent role already exists' });
+      setTimeout(() => setStatusMessage(null), 3000);
       return;
     }
 
@@ -231,7 +241,7 @@ const MOAPanel = () => {
             <button 
               className="add-model-btn"
               onClick={addModel}
-              disabled={models.length >= 5}
+              disabled={models.length >= MAX_MODELS}
             >
               <FiPlus /> Add Model
             </button>
@@ -497,6 +507,13 @@ const MOAPanel = () => {
           <FiSave /> Save Configuration
         </button>
       </div>
+
+      {/* Status Message */}
+      {statusMessage && (
+        <div className={`moa-status-message ${statusMessage.type}`}>
+          {statusMessage.text}
+        </div>
+      )}
     </div>
   );
 };

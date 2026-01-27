@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { FiSettings, FiX, FiEye, FiEyeOff, FiCheck, FiAlertCircle } from 'react-icons/fi';
+import { FiSettings, FiX, FiEye, FiEyeOff, FiCheck, FiAlertCircle, FiUpload, FiRotateCcw } from 'react-icons/fi';
 import useStore from '../store/useStore';
 import { saveAPIKey, getAPIKey } from '../utils/tauriCommands';
 import { testOpenAIConnection, testClaudeConnection } from '../utils/aiClient';
@@ -8,8 +8,12 @@ import { GEMINI_MODELS, testGeminiConnection } from '../utils/providers/gemini';
 import { MISTRAL_MODELS, testMistralConnection } from '../utils/providers/mistral';
 import { COHERE_MODELS, testCohereConnection } from '../utils/providers/cohere';
 import { DEFAULT_OLLAMA_MODELS, testOllamaConnection, getOllamaModels } from '../utils/providers/ollama';
+import { loadMCPConfig, saveMCPConfig } from '../utils/mcp/mcpClient';
+import { loadCustomLogo, saveCustomLogo, resetLogo, validateLogoFile, fileToDataURL } from '../utils/branding';
 import SkillsManager from './SkillsManager';
 import MOAPanel from './MOAPanel';
+import ContextSelector from './ContextSelector';
+import NetworkSettings from './NetworkSettings';
 import './Settings.css';
 
 const Settings = () => {
@@ -65,9 +69,19 @@ const Settings = () => {
   const [testingOllama, setTestingOllama] = useState(false);
   const [ollamaModels, setOllamaModels] = useState(DEFAULT_OLLAMA_MODELS);
 
+  // MCP
+  const [mcpEnabled, setMcpEnabled] = useState(false);
+  const [mcpServerUrl, setMcpServerUrl] = useState('');
+
+  // Branding
+  const [customLogo, setCustomLogo] = useState(null);
+  const [logoPreview, setLogoPreview] = useState(null);
+
   useEffect(() => {
     if (settingsOpen) {
       loadApiKeys();
+      loadMCPSettings();
+      loadBrandingSettings();
     }
   }, [settingsOpen]);
 
@@ -112,6 +126,66 @@ const Settings = () => {
     } catch (error) {
       console.error('Failed to load API keys:', error);
     }
+  };
+
+  const loadMCPSettings = () => {
+    try {
+      const config = loadMCPConfig();
+      setMcpEnabled(config.enabled || false);
+      setMcpServerUrl(config.serverUrl || '');
+    } catch (error) {
+      console.error('Failed to load MCP settings:', error);
+    }
+  };
+
+  const loadBrandingSettings = () => {
+    try {
+      const logo = loadCustomLogo();
+      if (logo) {
+        setCustomLogo(logo);
+        setLogoPreview(logo);
+      }
+    } catch (error) {
+      console.error('Failed to load branding settings:', error);
+    }
+  };
+
+  const handleLogoUpload = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const validation = validateLogoFile(file);
+    if (!validation.valid) {
+      alert(`Invalid logo file:\n${validation.errors.join('\n')}`);
+      return;
+    }
+
+    try {
+      const dataURL = await fileToDataURL(file);
+      setLogoPreview(dataURL);
+      setCustomLogo(dataURL);
+      saveCustomLogo(dataURL);
+      alert('Logo uploaded successfully!');
+    } catch (error) {
+      alert('Failed to upload logo: ' + error.message);
+    }
+  };
+
+  const handleResetLogo = () => {
+    if (confirm('Are you sure you want to reset to the default logo?')) {
+      resetLogo();
+      setCustomLogo(null);
+      setLogoPreview(null);
+      alert('Logo reset to default');
+    }
+  };
+
+  const handleSaveMCP = () => {
+    const config = loadMCPConfig();
+    config.enabled = mcpEnabled;
+    config.serverUrl = mcpServerUrl;
+    saveMCPConfig(config);
+    alert('MCP settings saved successfully!');
   };
 
   const handleTestOpenAI = async () => {
@@ -356,6 +430,18 @@ const Settings = () => {
               onClick={() => setActiveTab('moa')}
             >
               MOA
+            </button>
+            <button
+              className={`tab-btn ${activeTab === 'mcp' ? 'active' : ''}`}
+              onClick={() => setActiveTab('mcp')}
+            >
+              MCP
+            </button>
+            <button
+              className={`tab-btn ${activeTab === 'network' ? 'active' : ''}`}
+              onClick={() => setActiveTab('network')}
+            >
+              Network
             </button>
             <button
               className={`tab-btn ${activeTab === 'appearance' ? 'active' : ''}`}
@@ -740,8 +826,95 @@ const Settings = () => {
             </div>
           )}
 
+          {activeTab === 'mcp' && (
+            <div className="settings-section">
+              <h3>Model Context Protocol (MCP)</h3>
+              <p className="section-description">
+                Configure how context is shared with AI models
+              </p>
+              
+              <div className="form-group">
+                <label className="checkbox-label">
+                  <input
+                    type="checkbox"
+                    checked={mcpEnabled}
+                    onChange={(e) => setMcpEnabled(e.target.checked)}
+                  />
+                  <span>Enable MCP</span>
+                </label>
+              </div>
+
+              {mcpEnabled && (
+                <>
+                  <div className="form-group">
+                    <label>MCP Server URL (Optional)</label>
+                    <input
+                      type="text"
+                      value={mcpServerUrl}
+                      onChange={(e) => setMcpServerUrl(e.target.value)}
+                      placeholder="ws://localhost:3000/mcp"
+                    />
+                    <span className="input-hint">Leave empty for local context only</span>
+                  </div>
+
+                  <ContextSelector />
+
+                  <div className="form-actions">
+                    <button className="neon-button" onClick={handleSaveMCP}>
+                      Save MCP Settings
+                    </button>
+                  </div>
+                </>
+              )}
+            </div>
+          )}
+
+          {activeTab === 'network' && (
+            <div className="settings-section">
+              <h3>Network & Tunnel Settings</h3>
+              <NetworkSettings />
+            </div>
+          )}
+
           {activeTab === 'appearance' && (
             <div className="settings-section">
+              <h3>Custom Logo</h3>
+              <div className="logo-upload-section">
+                <div className="logo-preview">
+                  {logoPreview ? (
+                    <img src={logoPreview} alt="Custom Logo" className="preview-image" />
+                  ) : (
+                    <div className="default-logo-preview">
+                      <div className="sidebar-logo glitch" data-text="B">B</div>
+                    </div>
+                  )}
+                </div>
+                
+                <div className="logo-actions">
+                  <label className="upload-btn">
+                    <FiUpload />
+                    Upload Logo
+                    <input
+                      type="file"
+                      accept="image/svg+xml"
+                      onChange={handleLogoUpload}
+                      style={{ display: 'none' }}
+                    />
+                  </label>
+                  
+                  {customLogo && (
+                    <button className="reset-btn" onClick={handleResetLogo}>
+                      <FiRotateCcw />
+                      Reset to Default
+                    </button>
+                  )}
+                </div>
+                
+                <p className="upload-hint">
+                  Upload a custom SVG logo (recommended size: 64x64)
+                </p>
+              </div>
+
               <h3>Theme Settings</h3>
               <div className="form-group">
                 <label>Theme</label>

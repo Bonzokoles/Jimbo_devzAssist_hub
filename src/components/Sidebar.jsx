@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   FiHome, 
   FiCode, 
@@ -9,10 +9,20 @@ import {
   FiPackage
 } from 'react-icons/fi';
 import useStore from '../store/useStore';
+import { loadCustomLogo } from '../utils/branding';
 import './Sidebar.css';
 
 const Sidebar = () => {
   const { currentView, setCurrentView, toggleSettings, openaiKey, claudeKey } = useStore();
+  const [customLogo, setCustomLogo] = useState(null);
+
+  useEffect(() => {
+    // Load custom logo on mount
+    const logo = loadCustomLogo();
+    if (logo) {
+      setCustomLogo(logo);
+    }
+  }, []);
 
   const menuItems = [
     { id: 'dashboard', icon: FiHome, label: 'Dashboard' },
@@ -28,7 +38,11 @@ const Sidebar = () => {
   return (
     <div className="sidebar">
       <div className="sidebar-logo glitch" data-text="B">
-        B
+        {customLogo ? (
+          <img src={customLogo} alt="Logo" className="custom-logo" />
+        ) : (
+          'B'
+        )}
       </div>
 
       <div className="sidebar-menu">

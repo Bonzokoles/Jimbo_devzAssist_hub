@@ -31,7 +31,10 @@ export const getOllamaModels = async (baseUrl) => {
     const models = await invoke('get_ollama_models', {
       baseUrl,
     });
-    return models;
+    // Transform string array from backend to objects with id and name properties
+    // Backend returns: ["llama2", "mistral", ...]
+    // Frontend expects: [{id: "llama2", name: "llama2"}, ...]
+    return models.map(model => ({ id: model, name: model }));
   } catch (error) {
     console.error('Failed to get Ollama models:', error);
     return [];

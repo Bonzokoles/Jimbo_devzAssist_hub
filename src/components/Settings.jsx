@@ -8,6 +8,7 @@ import { GEMINI_MODELS, testGeminiConnection } from '../utils/providers/gemini';
 import { MISTRAL_MODELS, testMistralConnection } from '../utils/providers/mistral';
 import { COHERE_MODELS, testCohereConnection } from '../utils/providers/cohere';
 import { DEFAULT_OLLAMA_MODELS, testOllamaConnection, getOllamaModels } from '../utils/providers/ollama';
+import SkillsManager from './SkillsManager';
 import './Settings.css';
 
 const Settings = () => {
@@ -342,6 +343,12 @@ const Settings = () => {
               onClick={() => setActiveTab('ai')}
             >
               AI Providers
+            </button>
+            <button
+              className={`tab-btn ${activeTab === 'skills' ? 'active' : ''}`}
+              onClick={() => setActiveTab('skills')}
+            >
+              Skills
             </button>
             <button
               className={`tab-btn ${activeTab === 'appearance' ? 'active' : ''}`}
@@ -711,6 +718,12 @@ const Settings = () => {
                   </select>
                 </div>
               </div>
+            </div>
+          )}
+
+          {activeTab === 'skills' && (
+            <div className="settings-section">
+              <SkillsManager inSettingsModal={true} onUseSkill={() => {}} />
             </div>
           )}
 

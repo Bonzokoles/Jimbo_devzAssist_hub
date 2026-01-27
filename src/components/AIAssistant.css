@@ -181,8 +181,9 @@
   padding: 15px;
   border-top: 1px solid var(--glass-border);
   display: flex;
-  flex-wrap: wrap;
+  flex-direction: column;
   gap: 8px;
+  position: relative;
 }
 
 .quick-action-btn {
@@ -263,4 +264,68 @@
   border-radius: 8px;
   color: var(--neon-pink);
   font-size: 14px;
+}
+
+.quick-actions-row {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.quick-actions-row:last-child {
+  margin-bottom: 0;
+}
+
+.quick-action-btn.skill-btn {
+  background: linear-gradient(135deg, rgba(138, 43, 226, 0.2), rgba(75, 0, 130, 0.2));
+  border-color: rgba(138, 43, 226, 0.4);
+}
+
+.quick-action-btn.skill-btn:hover {
+  background: linear-gradient(135deg, rgba(138, 43, 226, 0.3), rgba(75, 0, 130, 0.3));
+  border-color: rgba(138, 43, 226, 0.6);
+}
+
+.skills-dropdown {
+  position: absolute;
+  bottom: 100%;
+  left: 0;
+  right: 0;
+  background: rgba(10, 10, 30, 0.95);
+  border: 1px solid rgba(0, 255, 255, 0.3);
+  border-radius: 8px;
+  padding: 0.5rem;
+  margin-bottom: 0.5rem;
+  max-height: 300px;
+  overflow-y: auto;
+  z-index: 100;
+  box-shadow: 0 -5px 20px rgba(0, 255, 255, 0.2);
+}
+
+.skill-menu-item {
+  width: 100%;
+  padding: 0.75rem;
+  background: rgba(0, 255, 255, 0.05);
+  border: 1px solid rgba(0, 255, 255, 0.2);
+  border-radius: 4px;
+  color: #fff;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.5rem;
+  transition: all 0.3s ease;
+}
+
+.skill-menu-item:last-child {
+  margin-bottom: 0;
+}
+
+.skill-menu-item:hover {
+  background: rgba(0, 255, 255, 0.1);
+  border-color: var(--neon-cyan);
+}
+
+.skill-menu-item span:first-child {
+  font-size: 1.2rem;
 }

@@ -7,6 +7,8 @@ import { GEMINI_MODELS } from '../utils/providers/gemini';
 import { MISTRAL_MODELS } from '../utils/providers/mistral';
 import { COHERE_MODELS } from '../utils/providers/cohere';
 import { DEFAULT_OLLAMA_MODELS } from '../utils/providers/ollama';
+import { BUILTIN_SKILLS, getSkillById } from '../utils/skills/builtinSkills';
+import { loadCustomSkills } from '../utils/skills/skillsStorage';
 import './AIAssistant.css';
 
 const AIAssistant = () => {
@@ -21,6 +23,8 @@ const AIAssistant = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   const messagesEndRef = useRef(null);
+  const [skills, setSkills] = useState([]);
+  const [showSkillsMenu, setShowSkillsMenu] = useState(false);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -29,6 +33,11 @@ const AIAssistant = () => {
   useEffect(() => {
     scrollToBottom();
   }, [messages, isLoading]);
+
+  useEffect(() => {
+    const customSkills = loadCustomSkills();
+    setSkills([...BUILTIN_SKILLS, ...customSkills]);
+  }, []);
 
   // Model options for each provider
   const getModelOptions = () => {
@@ -161,6 +170,18 @@ const AIAssistant = () => {
     setInput(prompt);
   };
 
+  const handleUseSkill = (skill) => {
+    let prompt = skill.systemPrompt + '\n\n';
+    
+    // Add current file content if required
+    if (skill.requiredContext && skill.requiredContext.includes('currentFile') && currentFileContent) {
+      prompt += `Code to analyze:\n\`\`\`\n${currentFileContent}\n\`\`\``;
+    }
+    
+    setInput(prompt);
+    setShowSkillsMenu(false);
+  };
+
   const handleKeyPress = (e) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
@@ -272,15 +293,59 @@ const AIAssistant = () => {
       </div>
 
       <div className="ai-quick-actions">
-        <button className="quick-action-btn" onClick={() => handleQuickAction('explain')}>
-          Explain Code
-        </button>
-        <button className="quick-action-btn" onClick={() => handleQuickAction('bugs')}>
-          Find Bugs
-        </button>
-        <button className="quick-action-btn" onClick={() => handleQuickAction('optimize')}>
-          Optimize
-        </button>
+        <div className="quick-actions-row">
+          <button className="quick-action-btn" onClick={() => handleQuickAction('explain')}>
+            Explain Code
+          </button>
+          <button className="quick-action-btn" onClick={() => handleQuickAction('bugs')}>
+            Find Bugs
+          </button>
+          <button className="quick-action-btn" onClick={() => handleQuickAction('optimize')}>
+            Optimize
+          </button>
+        </div>
+        
+        <div className="quick-actions-row">
+          <button 
+            className="quick-action-btn skill-btn" 
+            onClick={() => handleUseSkill(getSkillById('code-review'))}
+          >
+            🔍 Code Review
+          </button>
+          <button 
+            className="quick-action-btn skill-btn" 
+            onClick={() => handleUseSkill(getSkillById('security-audit'))}
+          >
+            🔐 Security Audit
+          </button>
+          <button 
+            className="quick-action-btn skill-btn" 
+            onClick={() => handleUseSkill(getSkillById('test-generator'))}
+          >
+            🧪 Generate Tests
+          </button>
+          <button 
+            className="quick-action-btn skill-btn" 
+            onClick={() => setShowSkillsMenu(!showSkillsMenu)}
+          >
+            ⚡ All Skills...
+          </button>
+        </div>
+        
+        {showSkillsMenu && (
+          <div className="skills-dropdown">
+            {skills.slice(0, 9).map((skill) => (
+              <button
+                key={skill.id}
+                className="skill-menu-item"
+                onClick={() => handleUseSkill(skill)}
+              >
+                <span>{skill.icon || '⚡'}</span>
+                <span>{skill.name}</span>
+              </button>
+            ))}
+          </div>
+        )}
       </div>
 
       <div className="ai-input-area">

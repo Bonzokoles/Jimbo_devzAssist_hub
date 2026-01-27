@@ -1,12 +1,21 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { FiSend, FiZap } from 'react-icons/fi';
 import useStore from '../store/useStore';
-import { callOpenAI, callClaude } from '../utils/aiClient';
+import { callAI } from '../utils/aiClient';
+import { OPENROUTER_MODELS } from '../utils/providers/openrouter';
+import { GEMINI_MODELS } from '../utils/providers/gemini';
+import { MISTRAL_MODELS } from '../utils/providers/mistral';
+import { COHERE_MODELS } from '../utils/providers/cohere';
+import { DEFAULT_OLLAMA_MODELS } from '../utils/providers/ollama';
 import './AIAssistant.css';
 
 const AIAssistant = () => {
-  const { openaiKey, claudeKey, toggleSettings, currentFileContent } = useStore();
+  const { 
+    openaiKey, claudeKey, openrouterKey, geminiKey, mistralKey, cohereKey, ollamaUrl,
+    toggleSettings, currentFileContent 
+  } = useStore();
   const [provider, setProvider] = useState('openai');
+  const [model, setModel] = useState('gpt-3.5-turbo');
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -21,7 +30,73 @@ const AIAssistant = () => {
     scrollToBottom();
   }, [messages, isLoading]);
 
-  const hasApiKey = provider === 'openai' ? openaiKey : claudeKey;
+  // Model options for each provider
+  const getModelOptions = () => {
+    switch (provider) {
+      case 'openai':
+        return [
+          { id: 'gpt-4-turbo-preview', name: 'GPT-4 Turbo' },
+          { id: 'gpt-4', name: 'GPT-4' },
+          { id: 'gpt-3.5-turbo', name: 'GPT-3.5 Turbo' },
+        ];
+      case 'claude':
+        return [
+          { id: 'claude-3-opus-20240229', name: 'Claude 3 Opus' },
+          { id: 'claude-3-sonnet-20240229', name: 'Claude 3 Sonnet' },
+          { id: 'claude-3-haiku-20240307', name: 'Claude 3 Haiku' },
+        ];
+      case 'openrouter':
+        return OPENROUTER_MODELS;
+      case 'gemini':
+        return GEMINI_MODELS;
+      case 'mistral':
+        return MISTRAL_MODELS;
+      case 'cohere':
+        return COHERE_MODELS;
+      case 'ollama':
+        return DEFAULT_OLLAMA_MODELS;
+      default:
+        return [];
+    }
+  };
+
+  // Get current API key based on provider
+  const getCurrentApiKey = () => {
+    switch (provider) {
+      case 'openai':
+        return openaiKey;
+      case 'claude':
+        return claudeKey;
+      case 'openrouter':
+        return openrouterKey;
+      case 'gemini':
+        return geminiKey;
+      case 'mistral':
+        return mistralKey;
+      case 'cohere':
+        return cohereKey;
+      case 'ollama':
+        return true; // Ollama doesn't need an API key
+      default:
+        return null;
+    }
+  };
+
+  const hasApiKey = getCurrentApiKey();
+
+  // Update model when provider changes
+  useEffect(() => {
+    const defaultModels = {
+      openai: 'gpt-3.5-turbo',
+      claude: 'claude-3-sonnet-20240229',
+      openrouter: 'openai/gpt-3.5-turbo',
+      gemini: 'gemini-pro',
+      mistral: 'mistral-small-latest',
+      cohere: 'command',
+      ollama: 'llama2',
+    };
+    setModel(defaultModels[provider] || '');
+  }, [provider]);
 
   const handleSend = async () => {
     if (!input.trim() || !hasApiKey) return;
@@ -38,21 +113,15 @@ const AIAssistant = () => {
 
     try {
       const chatMessages = [...messages, userMessage];
-      let response;
-
-      if (provider === 'openai') {
-        response = await callOpenAI(
-          openaiKey,
-          'gpt-3.5-turbo',
-          chatMessages
-        );
-      } else {
-        response = await callClaude(
-          claudeKey,
-          'claude-3-sonnet-20240229',
-          chatMessages
-        );
-      }
+      const currentApiKey = getCurrentApiKey();
+      
+      const response = await callAI(
+        provider,
+        currentApiKey,
+        model,
+        chatMessages,
+        provider === 'ollama' ? ollamaUrl : null
+      );
 
       const assistantMessage = {
         role: 'assistant',
@@ -99,6 +168,20 @@ const AIAssistant = () => {
     }
   };
 
+  // Get provider display name
+  const getProviderName = () => {
+    const names = {
+      openai: 'OpenAI',
+      claude: 'Claude',
+      openrouter: 'OpenRouter',
+      gemini: 'Google Gemini',
+      mistral: 'Mistral AI',
+      cohere: 'Cohere',
+      ollama: 'Ollama (Local)',
+    };
+    return names[provider] || provider;
+  };
+
   if (!hasApiKey) {
     return (
       <div className="ai-assistant">
@@ -110,7 +193,7 @@ const AIAssistant = () => {
         </div>
         <div className="ai-messages">
           <div className="no-api-key">
-            <p>No API key configured for {provider === 'openai' ? 'OpenAI' : 'Claude'}.</p>
+            <p>No API key configured for {getProviderName()}.</p>
             <p>Please configure your API keys in Settings.</p>
             <button className="neon-button" onClick={toggleSettings}>
               Open Settings
@@ -129,20 +212,30 @@ const AIAssistant = () => {
           AI Assistant
         </h2>
         <div className="ai-provider-selector">
-          <button
-            className={`provider-btn ${provider === 'openai' ? 'active' : ''}`}
-            onClick={() => setProvider('openai')}
-            disabled={!openaiKey}
+          <select 
+            className="provider-select"
+            value={provider}
+            onChange={(e) => setProvider(e.target.value)}
           >
-            OpenAI
-          </button>
-          <button
-            className={`provider-btn ${provider === 'claude' ? 'active' : ''}`}
-            onClick={() => setProvider('claude')}
-            disabled={!claudeKey}
+            <option value="openai" disabled={!openaiKey}>OpenAI</option>
+            <option value="claude" disabled={!claudeKey}>Claude</option>
+            <option value="openrouter" disabled={!openrouterKey}>OpenRouter</option>
+            <option value="gemini" disabled={!geminiKey}>Google Gemini</option>
+            <option value="mistral" disabled={!mistralKey}>Mistral AI</option>
+            <option value="cohere" disabled={!cohereKey}>Cohere</option>
+            <option value="ollama">Ollama (Local)</option>
+          </select>
+          <select 
+            className="model-select"
+            value={model}
+            onChange={(e) => setModel(e.target.value)}
           >
-            Claude
-          </button>
+            {getModelOptions().map((modelOption) => (
+              <option key={modelOption.id} value={modelOption.id}>
+                {modelOption.name}
+              </option>
+            ))}
+          </select>
         </div>
       </div>
 

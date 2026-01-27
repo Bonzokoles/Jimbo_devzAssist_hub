@@ -29,30 +29,44 @@
 .ai-provider-selector {
   display: flex;
   gap: 10px;
+  flex-direction: column;
 }
 
-.provider-btn {
-  padding: 6px 12px;
-  background: transparent;
-  border: 1px solid var(--glass-border);
-  color: rgba(255, 255, 255, 0.6);
+.provider-select,
+.model-select {
+  padding: 8px 12px;
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid var(--neon-cyan);
+  color: var(--neon-cyan);
   border-radius: 6px;
   cursor: pointer;
   font-size: 12px;
   transition: all 0.3s ease;
-  text-transform: uppercase;
-  letter-spacing: 1px;
+  font-family: inherit;
+  outline: none;
 }
 
-.provider-btn:hover {
-  border-color: var(--neon-cyan);
+.provider-select:hover,
+.model-select:hover {
+  border-color: var(--neon-green);
+  box-shadow: 0 0 10px rgba(0, 255, 65, 0.3);
+}
+
+.provider-select:focus,
+.model-select:focus {
+  border-color: var(--neon-green);
+  box-shadow: 0 0 15px rgba(0, 255, 65, 0.5);
+}
+
+.provider-select option,
+.model-select option {
+  background: var(--bg-darker);
   color: var(--neon-cyan);
+  padding: 8px;
 }
 
-.provider-btn.active {
-  background: var(--neon-cyan);
-  color: var(--bg-darker);
-  border-color: var(--neon-cyan);
+.provider-select option:disabled {
+  color: rgba(255, 255, 255, 0.3);
 }
 
 .ai-messages {

@@ -150,6 +150,250 @@ async fn call_claude_api(
 }
 
 #[tauri::command]
+async fn call_openrouter_api(
+    api_key: String,
+    model: String,
+    messages: Vec<Message>,
+) -> Result<String, String> {
+    let client = reqwest::Client::new();
+    
+    let payload = serde_json::json!({
+        "model": model,
+        "messages": messages,
+    });
+    
+    let response = client
+        .post("https://openrouter.ai/api/v1/chat/completions")
+        .header("Authorization", format!("Bearer {}", api_key))
+        .header("Content-Type", "application/json")
+        .header("HTTP-Referer", "https://bonzo-devassist.app")
+        .header("X-Title", "BONZO DevAssist AI")
+        .json(&payload)
+        .send()
+        .await
+        .map_err(|e| format!("Request failed: {}", e))?;
+    
+    if !response.status().is_success() {
+        let error_text = response.text().await.unwrap_or_else(|_| "Unknown error".to_string());
+        return Err(format!("API error: {}", error_text));
+    }
+    
+    let json: serde_json::Value = response.json().await.map_err(|e| format!("Failed to parse response: {}", e))?;
+    
+    let content = json["choices"][0]["message"]["content"]
+        .as_str()
+        .ok_or("Invalid response format")?
+        .to_string();
+    
+    Ok(content)
+}
+
+#[tauri::command]
+async fn call_gemini_api(
+    api_key: String,
+    model: String,
+    messages: Vec<Message>,
+) -> Result<String, String> {
+    let client = reqwest::Client::new();
+    
+    // Convert messages to Gemini format
+    let mut contents = vec![];
+    for msg in messages {
+        contents.push(serde_json::json!({
+            "role": if msg.role == "assistant" { "model" } else { "user" },
+            "parts": [{ "text": msg.content }]
+        }));
+    }
+    
+    let payload = serde_json::json!({
+        "contents": contents,
+    });
+    
+    let url = format!(
+        "https://generativelanguage.googleapis.com/v1beta/models/{}:generateContent?key={}",
+        model, api_key
+    );
+    
+    let response = client
+        .post(&url)
+        .header("Content-Type", "application/json")
+        .json(&payload)
+        .send()
+        .await
+        .map_err(|e| format!("Request failed: {}", e))?;
+    
+    if !response.status().is_success() {
+        let error_text = response.text().await.unwrap_or_else(|_| "Unknown error".to_string());
+        return Err(format!("API error: {}", error_text));
+    }
+    
+    let json: serde_json::Value = response.json().await.map_err(|e| format!("Failed to parse response: {}", e))?;
+    
+    let content = json["candidates"][0]["content"]["parts"][0]["text"]
+        .as_str()
+        .ok_or("Invalid response format")?
+        .to_string();
+    
+    Ok(content)
+}
+
+#[tauri::command]
+async fn call_mistral_api(
+    api_key: String,
+    model: String,
+    messages: Vec<Message>,
+) -> Result<String, String> {
+    let client = reqwest::Client::new();
+    
+    let payload = serde_json::json!({
+        "model": model,
+        "messages": messages,
+    });
+    
+    let response = client
+        .post("https://api.mistral.ai/v1/chat/completions")
+        .header("Authorization", format!("Bearer {}", api_key))
+        .header("Content-Type", "application/json")
+        .json(&payload)
+        .send()
+        .await
+        .map_err(|e| format!("Request failed: {}", e))?;
+    
+    if !response.status().is_success() {
+        let error_text = response.text().await.unwrap_or_else(|_| "Unknown error".to_string());
+        return Err(format!("API error: {}", error_text));
+    }
+    
+    let json: serde_json::Value = response.json().await.map_err(|e| format!("Failed to parse response: {}", e))?;
+    
+    let content = json["choices"][0]["message"]["content"]
+        .as_str()
+        .ok_or("Invalid response format")?
+        .to_string();
+    
+    Ok(content)
+}
+
+#[tauri::command]
+async fn call_cohere_api(
+    api_key: String,
+    model: String,
+    messages: Vec<Message>,
+) -> Result<String, String> {
+    let client = reqwest::Client::new();
+    
+    // Get the last user message
+    let message = messages.last()
+        .ok_or("No messages provided")?
+        .content.clone();
+    
+    // Build chat history (exclude last message)
+    let chat_history: Vec<_> = messages[..messages.len()-1]
+        .iter()
+        .map(|msg| serde_json::json!({
+            "role": if msg.role == "assistant" { "CHATBOT" } else { "USER" },
+            "message": msg.content
+        }))
+        .collect();
+    
+    let payload = serde_json::json!({
+        "model": model,
+        "message": message,
+        "chat_history": chat_history,
+    });
+    
+    let response = client
+        .post("https://api.cohere.ai/v1/chat")
+        .header("Authorization", format!("Bearer {}", api_key))
+        .header("Content-Type", "application/json")
+        .json(&payload)
+        .send()
+        .await
+        .map_err(|e| format!("Request failed: {}", e))?;
+    
+    if !response.status().is_success() {
+        let error_text = response.text().await.unwrap_or_else(|_| "Unknown error".to_string());
+        return Err(format!("API error: {}", error_text));
+    }
+    
+    let json: serde_json::Value = response.json().await.map_err(|e| format!("Failed to parse response: {}", e))?;
+    
+    let content = json["text"]
+        .as_str()
+        .ok_or("Invalid response format")?
+        .to_string();
+    
+    Ok(content)
+}
+
+#[tauri::command]
+async fn call_ollama_api(
+    base_url: String,
+    model: String,
+    messages: Vec<Message>,
+) -> Result<String, String> {
+    let client = reqwest::Client::new();
+    
+    let payload = serde_json::json!({
+        "model": model,
+        "messages": messages,
+        "stream": false,
+    });
+    
+    let url = format!("{}/api/chat", base_url);
+    
+    let response = client
+        .post(&url)
+        .header("Content-Type", "application/json")
+        .json(&payload)
+        .send()
+        .await
+        .map_err(|e| format!("Request failed: {}", e))?;
+    
+    if !response.status().is_success() {
+        let error_text = response.text().await.unwrap_or_else(|_| "Unknown error".to_string());
+        return Err(format!("API error: {}", error_text));
+    }
+    
+    let json: serde_json::Value = response.json().await.map_err(|e| format!("Failed to parse response: {}", e))?;
+    
+    let content = json["message"]["content"]
+        .as_str()
+        .ok_or("Invalid response format")?
+        .to_string();
+    
+    Ok(content)
+}
+
+#[tauri::command]
+async fn get_ollama_models(base_url: String) -> Result<Vec<String>, String> {
+    let client = reqwest::Client::new();
+    
+    let url = format!("{}/api/tags", base_url);
+    
+    let response = client
+        .get(&url)
+        .send()
+        .await
+        .map_err(|e| format!("Request failed: {}", e))?;
+    
+    if !response.status().is_success() {
+        return Err("Failed to get models from Ollama".to_string());
+    }
+    
+    let json: serde_json::Value = response.json().await.map_err(|e| format!("Failed to parse response: {}", e))?;
+    
+    let models = json["models"]
+        .as_array()
+        .ok_or("Invalid response format")?
+        .iter()
+        .filter_map(|m| m["name"].as_str().map(String::from))
+        .collect();
+    
+    Ok(models)
+}
+
+#[tauri::command]
 async fn save_api_key(app_handle: tauri::AppHandle, provider: String, key: String) -> Result<(), String> {
     let app_dir = path::app_data_dir(&app_handle.config())
         .ok_or("Failed to get app data directory")?;
@@ -201,6 +445,12 @@ fn main() {
             optimize_memory,
             call_openai_api,
             call_claude_api,
+            call_openrouter_api,
+            call_gemini_api,
+            call_mistral_api,
+            call_cohere_api,
+            call_ollama_api,
+            get_ollama_models,
             save_api_key,
             get_api_key,
             read_file_content,

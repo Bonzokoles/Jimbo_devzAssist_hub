@@ -22,8 +22,18 @@ const useStore = create((set) => ({
   // AI Providers
   openaiKey: '',
   claudeKey: '',
+  openrouterKey: '',
+  geminiKey: '',
+  mistralKey: '',
+  cohereKey: '',
+  ollamaUrl: 'http://localhost:11434',
   setOpenAIKey: (key) => set({ openaiKey: key }),
   setClaudeKey: (key) => set({ claudeKey: key }),
+  setOpenRouterKey: (key) => set({ openrouterKey: key }),
+  setGeminiKey: (key) => set({ geminiKey: key }),
+  setMistralKey: (key) => set({ mistralKey: key }),
+  setCohereKey: (key) => set({ cohereKey: key }),
+  setOllamaUrl: (url) => set({ ollamaUrl: url }),
 
   // System Stats
   systemStats: null,

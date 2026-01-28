@@ -18,6 +18,7 @@ const TerminalEmulator = () => {
   const containerRefs = useRef({});
   const commandBuffers = useRef({});
   const fitAddons = useRef({});
+  const cleanupFunctions = useRef({});
   
   useEffect(() => {
     // Initialize active terminal
@@ -141,8 +142,8 @@ const TerminalEmulator = () => {
     });
     resizeObserver.observe(container);
     
-    // Store cleanup function
-    term._cleanup = () => {
+    // Store cleanup function separately
+    cleanupFunctions.current[terminalId] = () => {
       resizeObserver.disconnect();
       term.dispose();
     };
@@ -150,7 +151,8 @@ const TerminalEmulator = () => {
   
   const executeTerminalCommand = async (term, command, terminalId) => {
     try {
-      const workingDir = workspaceRoot || process.cwd();
+      // Use workspace root or fallback to home directory
+      const workingDir = workspaceRoot || (typeof process !== 'undefined' && process.env?.HOME) || '/';
       const result = await executeCommand(command, workingDir);
       
       // Write output
@@ -190,15 +192,17 @@ const TerminalEmulator = () => {
   const closeTerminal = (id) => {
     if (terminals.length === 1) return; // Keep at least one
     
-    const term = terminalRefs.current[id];
-    if (term && term._cleanup) {
-      term._cleanup();
+    // Call cleanup function if it exists
+    const cleanup = cleanupFunctions.current[id];
+    if (cleanup) {
+      cleanup();
     }
     
     delete terminalRefs.current[id];
     delete containerRefs.current[id];
     delete commandBuffers.current[id];
     delete fitAddons.current[id];
+    delete cleanupFunctions.current[id];
     
     setTerminals(prev => prev.filter(t => t.id !== id));
     

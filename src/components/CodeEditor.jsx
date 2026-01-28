@@ -95,6 +95,7 @@ const CodeEditor = () => {
     }
   };
 
+  // This will be called by AI assistant when suggesting code changes
   const handleAIEdit = async (aiSuggestion) => {
     // AI suggested new code
     setPendingCode(aiSuggestion);
@@ -111,13 +112,6 @@ const CodeEditor = () => {
   const handleRejectDiff = () => {
     setShowDiff(false);
     setPendingCode(null);
-  };
-
-  const handleShowDiff = () => {
-    // For testing: create a sample diff
-    const sampleNewCode = code.replace(/function/g, 'const').replace(/;/g, ';\n  // Modified');
-    setPendingCode(sampleNewCode);
-    setShowDiff(true);
   };
 
   return (
@@ -163,9 +157,6 @@ const CodeEditor = () => {
           </button>
           <button className="toolbar-btn" title="Copy All">
             <FiCopy />
-          </button>
-          <button className="toolbar-btn pink-text" title="Show Diff Preview" onClick={handleShowDiff}>
-            🔄
           </button>
         </div>
       </div>

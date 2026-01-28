@@ -270,6 +270,19 @@ async fn read_dir(path_str: String) -> Result<Vec<FileEntry>, String> {
 
 #[tauri::command]
 async fn execute_command(command: String, working_dir: String) -> Result<ExecutionResult, String> {
+    // Basic security: Validate working directory exists and is a directory
+    let work_path = Path::new(&working_dir);
+    if !work_path.exists() || !work_path.is_dir() {
+        return Err(format!("Invalid working directory: {}", working_dir));
+    }
+    
+    // Note: This function allows command execution as designed for a terminal emulator.
+    // In production, consider implementing:
+    // 1. Command whitelisting for additional security
+    // 2. User confirmation dialogs for sensitive operations
+    // 3. Sandboxing or containerization
+    // 4. Audit logging of all executed commands
+    
     let output = if cfg!(target_os = "windows") {
         Command::new("cmd")
             .args(&["/C", &command])

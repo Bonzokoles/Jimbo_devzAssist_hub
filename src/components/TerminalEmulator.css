@@ -1,0 +1,173 @@
+.terminal-emulator {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: var(--bg-darker);
+}
+
+.terminal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--glass-bg);
+  border-bottom: 1px solid var(--glass-border);
+  padding: 8px 12px;
+  flex-shrink: 0;
+}
+
+.terminal-tabs {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex: 1;
+  overflow-x: auto;
+}
+
+.terminal-tab {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 6px 6px 0 0;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.7);
+  border: 1px solid transparent;
+  white-space: nowrap;
+}
+
+.terminal-tab:hover {
+  background: rgba(0, 255, 65, 0.1);
+  color: var(--neon-green);
+}
+
+.terminal-tab.active {
+  background: var(--bg-darker);
+  border-bottom: 2px solid var(--neon-green);
+  border-top: 1px solid var(--neon-green);
+  border-left: 1px solid var(--neon-green);
+  border-right: 1px solid var(--neon-green);
+  color: var(--neon-green);
+}
+
+.close-tab {
+  opacity: 0;
+  transition: opacity 0.2s;
+  cursor: pointer;
+  padding: 2px;
+}
+
+.terminal-tab:hover .close-tab {
+  opacity: 1;
+}
+
+.close-tab:hover {
+  color: var(--neon-pink);
+  transform: scale(1.2);
+}
+
+.add-terminal-btn {
+  padding: 6px 10px;
+  background: transparent;
+  border: 1px dashed var(--glass-border);
+  border-radius: 4px;
+  cursor: pointer;
+  color: rgba(255, 255, 255, 0.6);
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.add-terminal-btn:hover {
+  border-color: var(--neon-green);
+  color: var(--neon-green);
+  background: rgba(0, 255, 65, 0.1);
+}
+
+.terminal-actions {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.terminal-action-btn {
+  padding: 6px 12px;
+  background: transparent;
+  border: 1px solid var(--glass-border);
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.terminal-action-btn:hover {
+  border-color: var(--neon-cyan);
+  color: var(--neon-cyan);
+  background: rgba(0, 240, 255, 0.1);
+}
+
+.terminal-content {
+  flex: 1;
+  overflow: hidden;
+  position: relative;
+  background: #0a0e27;
+}
+
+.terminal-container {
+  width: 100%;
+  height: 100%;
+  padding: 10px;
+}
+
+.xterm {
+  height: 100%;
+  padding: 0;
+}
+
+.xterm .xterm-viewport {
+  overflow-y: scroll;
+}
+
+/* Custom scrollbar for terminal */
+.xterm .xterm-viewport::-webkit-scrollbar {
+  width: 8px;
+}
+
+.xterm .xterm-viewport::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.3);
+}
+
+.xterm .xterm-viewport::-webkit-scrollbar-thumb {
+  background: var(--neon-green);
+  border-radius: 4px;
+}
+
+.xterm .xterm-viewport::-webkit-scrollbar-thumb:hover {
+  background: var(--neon-cyan);
+}
+
+/* Terminal cursor animation */
+.xterm-cursor {
+  animation: blink 1s step-end infinite;
+}
+
+@keyframes blink {
+  0%, 50% { opacity: 1; }
+  51%, 100% { opacity: 0; }
+}
+
+/* Override xterm.js default colors for better cyberpunk aesthetic */
+.xterm-screen {
+  background-color: #0a0e27 !important;
+}
+
+.xterm-rows {
+  font-family: 'Fira Code', monospace;
+}

@@ -71,3 +71,12 @@ export const readDir = async (path) => {
     throw error;
   }
 };
+
+export const executeCommand = async (command, workingDir) => {
+  try {
+    return await invoke('execute_command', { command, workingDir });
+  } catch (error) {
+    console.error('Failed to execute command:', error);
+    throw error;
+  }
+};

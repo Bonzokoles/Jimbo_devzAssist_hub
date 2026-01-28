@@ -3,6 +3,7 @@ import Editor from '@monaco-editor/react';
 import { FiSave, FiPlay, FiSettings, FiMaximize, FiCopy, FiTerminal } from 'react-icons/fi';
 import { writeFileContent } from '../utils/tauriCommands';
 import useStore from '../store/useStore';
+import DiffViewer from './DiffViewer';
 import './CodeEditor.css';
 
 const CodeEditor = () => {
@@ -18,6 +19,8 @@ const CodeEditor = () => {
   const [systemPrompt, setSystemPrompt] = useState('You are an elite coding assistant...');
   const [agentPrompts, setAgentPrompts] = useState({}); // { 0: '...', 1: '...' }
   const [agentCodes, setAgentCodes] = useState({}); // { 0: '// Agent 1...', 1: '// Agent 2...' }
+  const [showDiff, setShowDiff] = useState(false);
+  const [pendingCode, setPendingCode] = useState(null);
 
   const handleSaveFile = async () => {
     if (!currentFile) {
@@ -92,6 +95,25 @@ const CodeEditor = () => {
     }
   };
 
+  // This will be called by AI assistant when suggesting code changes
+  const handleAIEdit = async (aiSuggestion) => {
+    // AI suggested new code
+    setPendingCode(aiSuggestion);
+    setShowDiff(true);
+  };
+
+  const handleAcceptDiff = (newCode) => {
+    setCode(newCode);
+    setCurrentFileContent(newCode);
+    setShowDiff(false);
+    setPendingCode(null);
+  };
+
+  const handleRejectDiff = () => {
+    setShowDiff(false);
+    setPendingCode(null);
+  };
+
   return (
     <div className={`code-editor ${agentCount > 0 ? 'split-mode' : ''}`}>
       <div className="editor-toolbar">
@@ -138,6 +160,19 @@ const CodeEditor = () => {
           </button>
         </div>
       </div>
+
+      {/* Diff viewer overlay */}
+      {showDiff && (
+        <div className="diff-overlay">
+          <DiffViewer
+            oldCode={code}
+            newCode={pendingCode}
+            language={language}
+            onAccept={handleAcceptDiff}
+            onReject={handleRejectDiff}
+          />
+        </div>
+      )}
 
       <div className="editor-container" style={{ 
         gridTemplateColumns: `1fr ${agentCount > 0 ? `repeat(${agentCount}, 1fr)` : ''}`

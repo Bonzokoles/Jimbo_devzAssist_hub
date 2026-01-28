@@ -4,6 +4,7 @@
 use serde::{Deserialize, Serialize};
 use std::fs;
 use std::path::Path;
+use std::process::Command;
 use sysinfo::{System, SystemExt, CpuExt, DiskExt};
 use tauri::api::path;
 
@@ -29,6 +30,13 @@ struct SystemStats {
 struct Message {
     role: String,
     content: String,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+struct ExecutionResult {
+    stdout: String,
+    stderr: String,
+    exit_code: i32,
 }
 
 #[tauri::command]
@@ -189,6 +197,9 @@ async fn read_file_content(path_str: String) -> Result<String, String> {
     fs::read_to_string(path).map_err(|e| format!("Failed to read file: {}", e))
 }
 
+#[tauri::command]
+async fn write_file_content(path_str: String, content: String) -> Result<(), String> {
+    let path = Path::new(&path_str);
     fs::write(path, content).map_err(|e| format!("Failed to write file: {}", e))
 }
 
@@ -257,6 +268,46 @@ async fn read_dir(path_str: String) -> Result<Vec<FileEntry>, String> {
     Ok(files)
 }
 
+#[tauri::command]
+async fn execute_command(command: String, working_dir: String) -> Result<ExecutionResult, String> {
+    // Basic security: Validate working directory exists and is a directory
+    let work_path = Path::new(&working_dir);
+    if !work_path.exists() || !work_path.is_dir() {
+        return Err(format!("Invalid working directory: {}", working_dir));
+    }
+    
+    // Note: This function allows command execution as designed for a terminal emulator.
+    // In production, consider implementing:
+    // 1. Command whitelisting for additional security
+    // 2. User confirmation dialogs for sensitive operations
+    // 3. Sandboxing or containerization
+    // 4. Audit logging of all executed commands
+    
+    let output = if cfg!(target_os = "windows") {
+        Command::new("cmd")
+            .args(&["/C", &command])
+            .current_dir(&working_dir)
+            .output()
+    } else {
+        Command::new("sh")
+            .arg("-c")
+            .arg(&command)
+            .current_dir(&working_dir)
+            .output()
+    };
+    
+    match output {
+        Ok(output) => {
+            Ok(ExecutionResult {
+                stdout: String::from_utf8_lossy(&output.stdout).to_string(),
+                stderr: String::from_utf8_lossy(&output.stderr).to_string(),
+                exit_code: output.status.code().unwrap_or(-1),
+            })
+        }
+        Err(e) => Err(format!("Failed to execute: {}", e)),
+    }
+}
+
 fn main() {
     tauri::Builder::default()
         .invoke_handler(tauri::generate_handler![
@@ -273,6 +324,7 @@ fn main() {
             manage_podman_container,
             check_localhost_port,
             read_dir,
+            execute_command,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

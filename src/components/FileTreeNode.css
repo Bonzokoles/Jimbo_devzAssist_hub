@@ -1,0 +1,65 @@
+.tree-node {
+  display: flex;
+  align-items: center;
+  padding: 0.4rem 0.5rem;
+  cursor: pointer;
+  user-select: none;
+  transition: background 0.15s ease;
+  border-left: 2px solid transparent;
+}
+
+.tree-node:hover {
+  background: rgba(212, 178, 97, 0.05);
+  border-left-color: rgba(212, 178, 97, 0.3);
+}
+
+.tree-node.selected {
+  background: rgba(212, 178, 97, 0.15);
+  border-left-color: #d4b261;
+}
+
+.tree-node-content {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+}
+
+.tree-chevron {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  color: rgba(212, 178, 97, 0.6);
+  transition: transform 0.2s ease;
+}
+
+.tree-chevron-placeholder {
+  width: 16px;
+  flex-shrink: 0;
+}
+
+.tree-icon {
+  font-size: 16px;
+  flex-shrink: 0;
+}
+
+.tree-icon.folder-icon {
+  color: #d4b261;
+}
+
+.tree-icon.file-icon {
+  color: rgba(212, 178, 97, 0.7);
+}
+
+.tree-label {
+  font-size: 13px;
+  color: #d4b261;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tree-children {
+  /* Children are rendered directly, indentation is handled by paddingLeft */
+}

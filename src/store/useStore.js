@@ -31,15 +31,28 @@ const useStore = create((set) => ({
   openaiKey: '',
   claudeKey: '',
   openrouterKey: '',
+  geminiKey: '',
+  mistralKey: '',
+  cohereKey: '',
+  ollamaUrl: 'http://localhost:11434',
+  
   setOpenAIKey: (key) => set({ openaiKey: key }),
   setClaudeKey: (key) => set({ claudeKey: key }),
   setOpenRouterKey: (key) => set({ openrouterKey: key }),
+  setGeminiKey: (key) => set({ geminiKey: key }),
+  setMistralKey: (key) => set({ mistralKey: key }),
+  setCohereKey: (key) => set({ cohereKey: key }),
+  setOllamaUrl: (url) => set({ ollamaUrl: url }),
 
   // Model Selection
   selectedModels: {
     openai: 'gpt-4',
     claude: 'claude-3-sonnet-20240229',
     openrouter: 'openai/gpt-3.5-turbo',
+    gemini: 'gemini-pro',
+    mistral: 'mistral-medium',
+    cohere: 'command-r',
+    ollama: 'llama3',
   },
   setSelectedModel: (provider, model) => set((state) => ({
     selectedModels: { ...state.selectedModels, [provider]: model }
@@ -67,6 +80,12 @@ const useStore = create((set) => ({
     linesOfCode: 45782,
     gitCommits: 892,
   },
+
+  // MOA Configuration
+  moaEnabled: false,
+  moaConfig: null,
+  setMOAEnabled: (enabled) => set({ moaEnabled: enabled }),
+  setMOAConfig: (config) => set({ moaConfig: config }),
 }));
 
 export default useStore;

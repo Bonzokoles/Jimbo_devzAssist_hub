@@ -1,12 +1,23 @@
 import React, { useState, useEffect } from 'react';
-import { FiSettings, FiX, FiEye, FiEyeOff, FiCheck, FiAlertCircle } from 'react-icons/fi';
+import { FiSettings, FiX, FiEye, FiEyeOff, FiCheck, FiAlertCircle, FiUpload, FiRotateCcw } from 'react-icons/fi';
 import useStore from '../store/useStore';
 import { saveAPIKey, getAPIKey } from '../utils/tauriCommands';
 import { testOpenAIConnection, testClaudeConnection } from '../utils/aiClient';
+import { OPENROUTER_MODELS, testOpenRouterConnection } from '../utils/providers/openrouter';
+import { GEMINI_MODELS, testGeminiConnection } from '../utils/providers/gemini';
+import { MISTRAL_MODELS, testMistralConnection } from '../utils/providers/mistral';
+import { COHERE_MODELS, testCohereConnection } from '../utils/providers/cohere';
+import { DEFAULT_OLLAMA_MODELS, testOllamaConnection, getOllamaModels } from '../utils/providers/ollama';
+import { loadMCPConfig, saveMCPConfig } from '../utils/mcp/mcpClient';
+import { loadCustomLogo, saveCustomLogo, resetLogo, validateLogoFile, fileToDataURL } from '../utils/branding';
+import SkillsManager from './SkillsManager';
+import MOAPanel from './MOAPanel';
+import ContextSelector from './ContextSelector';
+import NetworkSettings from './NetworkSettings';
 import './Settings.css';
 
 const Settings = () => {
-  const { settingsOpen, toggleSettings, setOpenAIKey, setClaudeKey } = useStore();
+  const { settingsOpen, toggleSettings, setOpenAIKey, setClaudeKey, setOpenRouterKey, setGeminiKey, setMistralKey, setCohereKey, setOllamaUrl } = useStore();
   const [activeTab, setActiveTab] = useState('ai');
   
   // OpenAI
@@ -25,14 +36,51 @@ const Settings = () => {
 
   // OpenRouter
   const [openrouterKeyInput, setOpenrouterKeyInput] = useState('');
-  const [openrouterModel, setOpenrouterModel] = useState('openai/gpt-3.5-turbo');
+  const [openrouterModel, setOpenrouterModel] = useState(OPENROUTER_MODELS[0].id);
   const [showOpenrouterKey, setShowOpenrouterKey] = useState(false);
   const [openrouterTestStatus, setOpenrouterTestStatus] = useState(null);
   const [testingOpenrouter, setTestingOpenrouter] = useState(false);
 
+  // Google Gemini
+  const [geminiKeyInput, setGeminiKeyInput] = useState('');
+  const [geminiModel, setGeminiModel] = useState(GEMINI_MODELS[0].id);
+  const [showGeminiKey, setShowGeminiKey] = useState(false);
+  const [geminiTestStatus, setGeminiTestStatus] = useState(null);
+  const [testingGemini, setTestingGemini] = useState(false);
+
+  // Mistral AI
+  const [mistralKeyInput, setMistralKeyInput] = useState('');
+  const [mistralModel, setMistralModel] = useState(MISTRAL_MODELS[0].id);
+  const [showMistralKey, setShowMistralKey] = useState(false);
+  const [mistralTestStatus, setMistralTestStatus] = useState(null);
+  const [testingMistral, setTestingMistral] = useState(false);
+
+  // Cohere
+  const [cohereKeyInput, setCohereKeyInput] = useState('');
+  const [cohereModel, setCohereModel] = useState(COHERE_MODELS[0].id);
+  const [showCohereKey, setShowCohereKey] = useState(false);
+  const [cohereTestStatus, setCohereTestStatus] = useState(null);
+  const [testingCohere, setTestingCohere] = useState(false);
+
+  // Ollama
+  const [ollamaUrlInput, setOllamaUrlInput] = useState('http://localhost:11434');
+  const [ollamaModel, setOllamaModel] = useState(DEFAULT_OLLAMA_MODELS[0].id);
+  const [ollamaTestStatus, setOllamaTestStatus] = useState(null);
+  const [testingOllama, setTestingOllama] = useState(false);
+  const [ollamaModels, setOllamaModels] = useState(DEFAULT_OLLAMA_MODELS);
+
+  // MCP
+  const [mcpEnabled, setMcpEnabled] = useState(false);
+  const [mcpServerUrl, setMcpServerUrl] = useState('');
+
+  // Branding
+  const [customLogo, setCustomLogo] = useState(null);
+  const [logoPreview, setLogoPreview] = useState(null);
   useEffect(() => {
     if (settingsOpen) {
       loadApiKeys();
+      loadMCPSettings();
+      loadBrandingSettings();
     }
   }, [settingsOpen]);
 
@@ -41,6 +89,10 @@ const Settings = () => {
       const openaiKey = await getAPIKey('openai');
       const claudeKey = await getAPIKey('claude');
       const openrouterKey = await getAPIKey('openrouter');
+      const geminiKey = await getAPIKey('gemini');
+      const mistralKey = await getAPIKey('mistral');
+      const cohereKey = await getAPIKey('cohere');
+      const ollamaUrl = await getAPIKey('ollama');
       
       if (openaiKey) {
         setOpenaiKeyInput(openaiKey);
@@ -54,9 +106,85 @@ const Settings = () => {
         setOpenrouterKeyInput(openrouterKey);
         setOpenRouterKey(openrouterKey);
       }
+      if (geminiKey) {
+        setGeminiKeyInput(geminiKey);
+        setGeminiKey(geminiKey);
+      }
+      if (mistralKey) {
+        setMistralKeyInput(mistralKey);
+        setMistralKey(mistralKey);
+      }
+      if (cohereKey) {
+        setCohereKeyInput(cohereKey);
+        setCohereKey(cohereKey);
+      }
+      if (ollamaUrl) {
+        setOllamaUrlInput(ollamaUrl);
+        setOllamaUrl(ollamaUrl);
+      }
     } catch (error) {
       console.error('Failed to load API keys:', error);
     }
+  };
+
+  const loadMCPSettings = () => {
+    try {
+      const config = loadMCPConfig();
+      setMcpEnabled(config.enabled || false);
+      setMcpServerUrl(config.serverUrl || '');
+    } catch (error) {
+      console.error('Failed to load MCP settings:', error);
+    }
+  };
+
+  const loadBrandingSettings = () => {
+    try {
+      const logo = loadCustomLogo();
+      if (logo) {
+        setCustomLogo(logo);
+        setLogoPreview(logo);
+      }
+    } catch (error) {
+      console.error('Failed to load branding settings:', error);
+    }
+  };
+
+  const handleLogoUpload = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const validation = validateLogoFile(file);
+    if (!validation.valid) {
+      alert(`Invalid logo file:\n${validation.errors.join('\n')}`);
+      return;
+    }
+
+    try {
+      const dataURL = await fileToDataURL(file);
+      setLogoPreview(dataURL);
+      setCustomLogo(dataURL);
+      saveCustomLogo(dataURL);
+      alert('Logo uploaded successfully!');
+    } catch (error) {
+      alert('Failed to upload logo: ' + error.message);
+    }
+  };
+
+  const handleResetLogo = () => {
+    if (confirm('Are you sure you want to reset to the default logo?')) {
+      resetLogo();
+      setCustomLogo(null);
+      setLogoPreview(null);
+      alert('Logo reset to default');
+    }
+  };
+
+  const handleSaveMCP = () => {
+    const config = loadMCPConfig();
+    config.enabled = mcpEnabled;
+    config.serverUrl = mcpServerUrl;
+    saveMCPConfig(config);
+    alert('MCP settings saved successfully!');
   };
 
   const handleTestOpenAI = async () => {
@@ -128,6 +256,105 @@ const Settings = () => {
     }
   };
 
+  const handleTestGemini = async () => {
+    if (!geminiKeyInput.trim()) {
+      setGeminiTestStatus({ success: false, message: 'Please enter an API key' });
+      return;
+    }
+
+    setTestingGemini(true);
+    setGeminiTestStatus(null);
+
+    try {
+      const success = await testGeminiConnection(geminiKeyInput);
+      if (success) {
+        setGeminiTestStatus({ success: true, message: 'Connection successful!' });
+      } else {
+        setGeminiTestStatus({ success: false, message: 'Connection failed. Check your API key.' });
+      }
+    } catch (error) {
+      setGeminiTestStatus({ success: false, message: 'Connection failed: ' + error.message });
+    } finally {
+      setTestingGemini(false);
+    }
+  };
+
+  const handleTestMistral = async () => {
+    if (!mistralKeyInput.trim()) {
+      setMistralTestStatus({ success: false, message: 'Please enter an API key' });
+      return;
+    }
+
+    setTestingMistral(true);
+    setMistralTestStatus(null);
+
+    try {
+      const success = await testMistralConnection(mistralKeyInput);
+      if (success) {
+        setMistralTestStatus({ success: true, message: 'Connection successful!' });
+      } else {
+        setMistralTestStatus({ success: false, message: 'Connection failed. Check your API key.' });
+      }
+    } catch (error) {
+      setMistralTestStatus({ success: false, message: 'Connection failed: ' + error.message });
+    } finally {
+      setTestingMistral(false);
+    }
+  };
+
+  const handleTestCohere = async () => {
+    if (!cohereKeyInput.trim()) {
+      setCohereTestStatus({ success: false, message: 'Please enter an API key' });
+      return;
+    }
+
+    setTestingCohere(true);
+    setCohereTestStatus(null);
+
+    try {
+      const success = await testCohereConnection(cohereKeyInput);
+      if (success) {
+        setCohereTestStatus({ success: true, message: 'Connection successful!' });
+      } else {
+        setCohereTestStatus({ success: false, message: 'Connection failed. Check your API key.' });
+      }
+    } catch (error) {
+      setCohereTestStatus({ success: false, message: 'Connection failed: ' + error.message });
+    } finally {
+      setTestingCohere(false);
+    }
+  };
+
+  const handleTestOllama = async () => {
+    if (!ollamaUrlInput.trim()) {
+      setOllamaTestStatus({ success: false, message: 'Please enter a base URL' });
+      return;
+    }
+
+    setTestingOllama(true);
+    setOllamaTestStatus(null);
+
+    try {
+      const success = await testOllamaConnection(ollamaUrlInput);
+      if (success) {
+        setOllamaTestStatus({ success: true, message: 'Connection successful!' });
+        try {
+          const models = await getOllamaModels(ollamaUrlInput);
+          if (models && models.length > 0) {
+            setOllamaModels(models);
+          }
+        } catch (error) {
+          console.error('Failed to fetch Ollama models:', error);
+        }
+      } else {
+        setOllamaTestStatus({ success: false, message: 'Connection failed. Check your base URL.' });
+      }
+    } catch (error) {
+      setOllamaTestStatus({ success: false, message: 'Connection failed: ' + error.message });
+    } finally {
+      setTestingOllama(false);
+    }
+  };
   const handleSave = async () => {
     try {
       if (openaiKeyInput.trim()) {
@@ -141,6 +368,22 @@ const Settings = () => {
       if (openrouterKeyInput.trim()) {
         await saveAPIKey('openrouter', openrouterKeyInput);
         setOpenRouterKey(openrouterKeyInput);
+      }
+      if (geminiKeyInput.trim()) {
+        await saveAPIKey('gemini', geminiKeyInput);
+        setGeminiKey(geminiKeyInput);
+      }
+      if (mistralKeyInput.trim()) {
+        await saveAPIKey('mistral', mistralKeyInput);
+        setMistralKey(mistralKeyInput);
+      }
+      if (cohereKeyInput.trim()) {
+        await saveAPIKey('cohere', cohereKeyInput);
+        setCohereKey(cohereKeyInput);
+      }
+      if (ollamaUrlInput.trim()) {
+        await saveAPIKey('ollama', ollamaUrlInput);
+        setOllamaUrl(ollamaUrlInput);
       }
       
       alert('Settings saved successfully!');
@@ -173,6 +416,30 @@ const Settings = () => {
               onClick={() => setActiveTab('ai')}
             >
               AI Providers
+            </button>
+            <button
+              className={`tab-btn ${activeTab === 'skills' ? 'active' : ''}`}
+              onClick={() => setActiveTab('skills')}
+            >
+              Skills
+            </button>
+            <button
+              className={`tab-btn ${activeTab === 'moa' ? 'active' : ''}`}
+              onClick={() => setActiveTab('moa')}
+            >
+              MOA
+            </button>
+            <button
+              className={`tab-btn ${activeTab === 'mcp' ? 'active' : ''}`}
+              onClick={() => setActiveTab('mcp')}
+            >
+              MCP
+            </button>
+            <button
+              className={`tab-btn ${activeTab === 'network' ? 'active' : ''}`}
+              onClick={() => setActiveTab('network')}
+            >
+              Network
             </button>
             <button
               className={`tab-btn ${activeTab === 'appearance' ? 'active' : ''}`}
@@ -295,7 +562,7 @@ const Settings = () => {
               </div>
 
               <div className="settings-section">
-                <h3>OpenRouter Configuration (Multi-Model)</h3>
+                <h3>OpenRouter Configuration</h3>
                 <div className="form-group">
                   <label>API Key</label>
                   <div className="input-wrapper">
@@ -315,7 +582,7 @@ const Settings = () => {
                     </button>
                   </div>
                   <p className="provider-info">
-                    Get access to 100+ models at <a href="https://openrouter.ai/keys" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--neon-cyan)' }}>OpenRouter.ai</a>
+                    Get your API key from <a href="https://openrouter.ai/keys" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--neon-cyan)' }}>OpenRouter.ai</a>
                   </p>
                 </div>
 
@@ -337,21 +604,315 @@ const Settings = () => {
                 )}
 
                 <div className="form-group model-select">
-                  <label>Initial Model</label>
+                  <label>Default Model</label>
                   <select value={openrouterModel} onChange={(e) => setOpenrouterModel(e.target.value)}>
-                    <option value="deepseek/deepseek-chat">DeepSeek Chat</option>
-                    <option value="google/gemini-pro-1.5">Gemini Pro 1.5</option>
-                    <option value="meta-llama/llama-3-70b-instruct">Llama 3 70B</option>
-                    <option value="anthropic/claude-3-haiku">Claude 3 Haiku (via OR)</option>
-                    <option value="mistralai/mixtral-8x7b-instruct">Mixtral 8x7B</option>
+                    {OPENROUTER_MODELS.map((model) => (
+                      <option key={model.id} value={model.id}>{model.name}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              <div className="settings-section">
+                <h3>Google Gemini Configuration</h3>
+                <div className="form-group">
+                  <label>API Key</label>
+                  <div className="input-wrapper">
+                    <input
+                      type={showGeminiKey ? 'text' : 'password'}
+                      value={geminiKeyInput}
+                      onChange={(e) => setGeminiKeyInput(e.target.value)}
+                      placeholder="AIza..."
+                      style={{ paddingRight: '45px' }}
+                    />
+                    <button
+                      className="toggle-visibility-btn"
+                      onClick={() => setShowGeminiKey(!showGeminiKey)}
+                      style={{ position: 'absolute' }}
+                    >
+                      {showGeminiKey ? <FiEyeOff /> : <FiEye />}
+                    </button>
+                  </div>
+                  <p className="provider-info">
+                    Get your API key from <a href="https://makersuite.google.com/app/apikey" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--neon-cyan)' }}>Google AI Studio</a>
+                  </p>
+                </div>
+
+                <div className="input-wrapper">
+                  <button
+                    className="test-connection-btn"
+                    onClick={handleTestGemini}
+                    disabled={testingGemini || !geminiKeyInput.trim()}
+                  >
+                    {testingGemini ? 'Testing...' : 'Test Connection'}
+                  </button>
+                </div>
+
+                {geminiTestStatus && (
+                  <div className={`connection-status ${geminiTestStatus.success ? 'success' : 'error'}`}>
+                    {geminiTestStatus.success ? <FiCheck /> : <FiAlertCircle />}
+                    {geminiTestStatus.message}
+                  </div>
+                )}
+
+                <div className="form-group model-select">
+                  <label>Default Model</label>
+                  <select value={geminiModel} onChange={(e) => setGeminiModel(e.target.value)}>
+                    {GEMINI_MODELS.map((model) => (
+                      <option key={model.id} value={model.id}>{model.name}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              <div className="settings-section">
+                <h3>Mistral AI Configuration</h3>
+                <div className="form-group">
+                  <label>API Key</label>
+                  <div className="input-wrapper">
+                    <input
+                      type={showMistralKey ? 'text' : 'password'}
+                      value={mistralKeyInput}
+                      onChange={(e) => setMistralKeyInput(e.target.value)}
+                      placeholder="Enter your Mistral API key"
+                      style={{ paddingRight: '45px' }}
+                    />
+                    <button
+                      className="toggle-visibility-btn"
+                      onClick={() => setShowMistralKey(!showMistralKey)}
+                      style={{ position: 'absolute' }}
+                    >
+                      {showMistralKey ? <FiEyeOff /> : <FiEye />}
+                    </button>
+                  </div>
+                  <p className="provider-info">
+                    Get your API key from <a href="https://console.mistral.ai/api-keys/" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--neon-cyan)' }}>Mistral AI Console</a>
+                  </p>
+                </div>
+
+                <div className="input-wrapper">
+                  <button
+                    className="test-connection-btn"
+                    onClick={handleTestMistral}
+                    disabled={testingMistral || !mistralKeyInput.trim()}
+                  >
+                    {testingMistral ? 'Testing...' : 'Test Connection'}
+                  </button>
+                </div>
+
+                {mistralTestStatus && (
+                  <div className={`connection-status ${mistralTestStatus.success ? 'success' : 'error'}`}>
+                    {mistralTestStatus.success ? <FiCheck /> : <FiAlertCircle />}
+                    {mistralTestStatus.message}
+                  </div>
+                )}
+
+                <div className="form-group model-select">
+                  <label>Default Model</label>
+                  <select value={mistralModel} onChange={(e) => setMistralModel(e.target.value)}>
+                    {MISTRAL_MODELS.map((model) => (
+                      <option key={model.id} value={model.id}>{model.name}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              <div className="settings-section">
+                <h3>Cohere Configuration</h3>
+                <div className="form-group">
+                  <label>API Key</label>
+                  <div className="input-wrapper">
+                    <input
+                      type={showCohereKey ? 'text' : 'password'}
+                      value={cohereKeyInput}
+                      onChange={(e) => setCohereKeyInput(e.target.value)}
+                      placeholder="Enter your Cohere API key"
+                      style={{ paddingRight: '45px' }}
+                    />
+                    <button
+                      className="toggle-visibility-btn"
+                      onClick={() => setShowCohereKey(!showCohereKey)}
+                      style={{ position: 'absolute' }}
+                    >
+                      {showCohereKey ? <FiEyeOff /> : <FiEye />}
+                    </button>
+                  </div>
+                  <p className="provider-info">
+                    Get your API key from <a href="https://dashboard.cohere.com/api-keys" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--neon-cyan)' }}>Cohere Dashboard</a>
+                  </p>
+                </div>
+
+                <div className="input-wrapper">
+                  <button
+                    className="test-connection-btn"
+                    onClick={handleTestCohere}
+                    disabled={testingCohere || !cohereKeyInput.trim()}
+                  >
+                    {testingCohere ? 'Testing...' : 'Test Connection'}
+                  </button>
+                </div>
+
+                {cohereTestStatus && (
+                  <div className={`connection-status ${cohereTestStatus.success ? 'success' : 'error'}`}>
+                    {cohereTestStatus.success ? <FiCheck /> : <FiAlertCircle />}
+                    {cohereTestStatus.message}
+                  </div>
+                )}
+
+                <div className="form-group model-select">
+                  <label>Default Model</label>
+                  <select value={cohereModel} onChange={(e) => setCohereModel(e.target.value)}>
+                    {COHERE_MODELS.map((model) => (
+                      <option key={model.id} value={model.id}>{model.name}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              <div className="settings-section">
+                <h3>Ollama Configuration (Local LLM)</h3>
+                <div className="form-group">
+                  <label>Base URL</label>
+                  <div className="input-wrapper">
+                    <input
+                      type="text"
+                      value={ollamaUrlInput}
+                      onChange={(e) => setOllamaUrlInput(e.target.value)}
+                      placeholder="http://localhost:11434"
+                    />
+                  </div>
+                </div>
+
+                <div className="input-wrapper">
+                  <button
+                    className="test-connection-btn"
+                    onClick={handleTestOllama}
+                    disabled={testingOllama || !ollamaUrlInput.trim()}
+                  >
+                    {testingOllama ? 'Testing...' : 'Test Connection'}
+                  </button>
+                </div>
+
+                {ollamaTestStatus && (
+                  <div className={`connection-status ${ollamaTestStatus.success ? 'success' : 'error'}`}>
+                    {ollamaTestStatus.success ? <FiCheck /> : <FiAlertCircle />}
+                    {ollamaTestStatus.message}
+                  </div>
+                )}
+
+                <div className="form-group model-select">
+                  <label>Default Model</label>
+                  <select value={ollamaModel} onChange={(e) => setOllamaModel(e.target.value)}>
+                    {ollamaModels.map((model) => (
+                      <option key={model.id} value={model.id}>{model.name}</option>
+                    ))}
                   </select>
                 </div>
               </div>
             </div>
           )}
 
+          {activeTab === 'skills' && (
+            <div className="settings-section">
+              <SkillsManager inSettingsModal={true} onUseSkill={() => {}} />
+            </div>
+          )}
+
+          {activeTab === 'moa' && (
+            <div className="settings-section">
+              <MOAPanel />
+            </div>
+          )}
+
+          {activeTab === 'mcp' && (
+            <div className="settings-section">
+              <h3>Model Context Protocol (MCP)</h3>
+              <p className="section-description">
+                Configure how context is shared with AI models
+              </p>
+              
+              <div className="form-group">
+                <label className="checkbox-label">
+                  <input
+                    type="checkbox"
+                    checked={mcpEnabled}
+                    onChange={(e) => setMcpEnabled(e.target.checked)}
+                  />
+                  <span>Enable MCP</span>
+                </label>
+              </div>
+
+              {mcpEnabled && (
+                <>
+                  <div className="form-group">
+                    <label>MCP Server URL (Optional)</label>
+                    <input
+                      type="text"
+                      value={mcpServerUrl}
+                      onChange={(e) => setMcpServerUrl(e.target.value)}
+                      placeholder="ws://localhost:3000/mcp"
+                    />
+                    <span className="input-hint">Leave empty for local context only</span>
+                  </div>
+
+                  <ContextSelector />
+
+                  <div className="form-actions">
+                    <button className="neon-button" onClick={handleSaveMCP}>
+                      Save MCP Settings
+                    </button>
+                  </div>
+                </>
+              )}
+            </div>
+          )}
+
+          {activeTab === 'network' && (
+            <div className="settings-section">
+              <h3>Network & Tunnel Settings</h3>
+              <NetworkSettings />
+            </div>
+          )}
+
           {activeTab === 'appearance' && (
             <div className="settings-section">
+              <h3>Custom Logo</h3>
+              <div className="logo-upload-section">
+                <div className="logo-preview">
+                  {logoPreview ? (
+                    <img src={logoPreview} alt="Custom Logo" className="preview-image" />
+                  ) : (
+                    <div className="default-logo-preview">
+                      <div className="sidebar-logo glitch" data-text="B">B</div>
+                    </div>
+                  )}
+                </div>
+                
+                <div className="logo-actions">
+                  <label className="upload-btn">
+                    <FiUpload />
+                    Upload Logo
+                    <input
+                      type="file"
+                      accept="image/svg+xml"
+                      onChange={handleLogoUpload}
+                      style={{ display: 'none' }}
+                    />
+                  </label>
+                  
+                  {customLogo && (
+                    <button className="reset-btn" onClick={handleResetLogo}>
+                      <FiRotateCcw />
+                      Reset to Default
+                    </button>
+                  )}
+                </div>
+                
+                <p className="upload-hint">
+                  Upload a custom SVG logo (recommended size: 64x64)
+                </p>
+              </div>
+
               <h3>Theme Settings</h3>
               <div className="form-group">
                 <label>Theme</label>

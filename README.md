@@ -310,6 +310,7 @@ This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) 
 ## 📚 Additional Resources
 
 - **[RAG, Agent & Vector DB Visualization Resources](RAG_AGENT_VISUALIZATION_RESOURCES.md)** - Comprehensive guide to tools for visualizing RAG databases, agent workflows, and vector database resources
+- **[🇵🇱 Przewodnik Wizualizacji (Polski)](PRZEWODNIK_WIZUALIZACJA_RAG_PL.md)** - Polish quick reference guide for RAG and agent visualization tools
 
 ## 📧 Support
 

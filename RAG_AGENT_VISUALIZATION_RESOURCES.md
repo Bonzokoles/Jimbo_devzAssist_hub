@@ -68,11 +68,15 @@ Wszystkie wymienione projekty są open-source i można je uruchomić lokalnie.
 - **Best For**: Flexible RAG pipeline development
 
 ### 5. **kotaemon: The RAG UI**
+- **Repository**: [Cinnamon/kotaemon](https://github.com/Cinnamon/kotaemon)
 - **Description**: Specialized UI for managing RAG applications
 - **Features**:
   - 👁️ Live visualization of retrieval steps
   - 🎯 Grounding step visualization
   - 📈 Real-time monitoring
+  - 🎨 Gradio-based web UI
+  - 🔌 Multiple LLM provider support
+- **Tech Stack**: Python, Gradio
 - **Best For**: Dedicated RAG management interface
 
 ### 6. **GraphRAG-Visualizer**
@@ -110,16 +114,18 @@ Wszystkie wymienione projekty są open-source i można je uruchomić lokalnie.
 - **Best For**: No-code agent workflow building
 
 ### 2. **Langflow**
+- **Repository**: [langflow-ai/langflow](https://github.com/langflow-ai/langflow)
 - **Description**: Drag-and-drop visual environment for LLM agents
 - **Features**:
   - 🎯 Visual flow builder
   - 🔍 Agent state monitoring
   - 📊 Execution tracing
   - 🧪 Testing and deployment tools
+- **Tech Stack**: Python
 - **Best For**: Visual LLM agent design and testing
 
 ### 3. **AgentBoard**
-- **Repository**: Available on GitHub
+- **Repository**: [AI-Hub-Admin/agentboard](https://github.com/AI-Hub-Admin/agentboard)
 - **Description**: AI agent visualization toolkit
 - **Features**:
   - 🔄 Agent loop visualization
@@ -127,6 +133,9 @@ Wszystkie wymienione projekty są open-source i można je uruchomić lokalnie.
   - 🔧 Tool invocation sequences
   - 📊 RAG visualization
   - 🎯 Multi-modal agent workflows
+  - 🔌 AutoGen and LangChain integration
+  - 🌐 Flask-based web UI
+- **Tech Stack**: Python, Flask
 - **Best For**: Detailed agent behavior analysis
 
 ### 4. **OpenChatBI**
@@ -337,7 +346,7 @@ Recommended: Chroma + Custom UI
 ### Community Resources
 - [NocoBase AI Agent Projects](https://www.nocobase.com/en/blog/github-open-source-ai-agent-projects)
 - [KDnuggets Agent Repositories](https://www.kdnuggets.com/10-github-repositories-for-mastering-agents-and-mcps)
-- [Analytics Vidhya RAG Systems](https://www.analyticsvidhya.com/blog/2025/10/github-repositories-for-mastering-rag-systems/)
+- [Analytics Vidhya RAG Systems](https://www.analyticsvidhya.com/blog/github-repositories-for-mastering-rag-systems/)
 
 ---
 

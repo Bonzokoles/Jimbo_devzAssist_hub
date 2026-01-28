@@ -3,6 +3,7 @@ import Editor from '@monaco-editor/react';
 import { FiSave, FiPlay, FiSettings, FiMaximize, FiCopy, FiTerminal } from 'react-icons/fi';
 import { writeFileContent } from '../utils/tauriCommands';
 import useStore from '../store/useStore';
+import DiffViewer from './DiffViewer';
 import './CodeEditor.css';
 
 const CodeEditor = () => {
@@ -18,6 +19,8 @@ const CodeEditor = () => {
   const [systemPrompt, setSystemPrompt] = useState('You are an elite coding assistant...');
   const [agentPrompts, setAgentPrompts] = useState({}); // { 0: '...', 1: '...' }
   const [agentCodes, setAgentCodes] = useState({}); // { 0: '// Agent 1...', 1: '// Agent 2...' }
+  const [showDiff, setShowDiff] = useState(false);
+  const [pendingCode, setPendingCode] = useState(null);
 
   const handleSaveFile = async () => {
     if (!currentFile) {
@@ -92,6 +95,31 @@ const CodeEditor = () => {
     }
   };
 
+  const handleAIEdit = async (aiSuggestion) => {
+    // AI suggested new code
+    setPendingCode(aiSuggestion);
+    setShowDiff(true);
+  };
+
+  const handleAcceptDiff = (newCode) => {
+    setCode(newCode);
+    setCurrentFileContent(newCode);
+    setShowDiff(false);
+    setPendingCode(null);
+  };
+
+  const handleRejectDiff = () => {
+    setShowDiff(false);
+    setPendingCode(null);
+  };
+
+  const handleShowDiff = () => {
+    // For testing: create a sample diff
+    const sampleNewCode = code.replace(/function/g, 'const').replace(/;/g, ';\n  // Modified');
+    setPendingCode(sampleNewCode);
+    setShowDiff(true);
+  };
+
   return (
     <div className={`code-editor ${agentCount > 0 ? 'split-mode' : ''}`}>
       <div className="editor-toolbar">
@@ -136,8 +164,24 @@ const CodeEditor = () => {
           <button className="toolbar-btn" title="Copy All">
             <FiCopy />
           </button>
+          <button className="toolbar-btn pink-text" title="Show Diff Preview" onClick={handleShowDiff}>
+            🔄
+          </button>
         </div>
       </div>
+
+      {/* Diff viewer overlay */}
+      {showDiff && (
+        <div className="diff-overlay">
+          <DiffViewer
+            oldCode={code}
+            newCode={pendingCode}
+            language={language}
+            onAccept={handleAcceptDiff}
+            onReject={handleRejectDiff}
+          />
+        </div>
+      )}
 
       <div className="editor-container" style={{ 
         gridTemplateColumns: `1fr ${agentCount > 0 ? `repeat(${agentCount}, 1fr)` : ''}`

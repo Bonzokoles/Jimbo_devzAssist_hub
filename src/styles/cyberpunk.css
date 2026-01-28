@@ -144,6 +144,14 @@ button:not(.primary):hover {
   text-shadow: 0 0 10px var(--neon-pink), 0 0 20px var(--neon-pink);
 }
 
+.cyan-text {
+  color: var(--neon-cyan);
+}
+
+.pink-text {
+  color: var(--neon-pink);
+}
+
 @keyframes flicker {
   0%, 100% { opacity: 1; }
   50% { opacity: 0.8; }

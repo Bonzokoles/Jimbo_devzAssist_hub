@@ -138,6 +138,43 @@ The built application will be located in:
 - **macOS**: `src-tauri/target/release/bundle/dmg/`
 - **Linux**: `src-tauri/target/release/bundle/deb/` or `/appimage/`
 
+## ☁️ Web Deployment (Cloudflare Pages)
+
+You can also deploy this application as a web app on Cloudflare Pages! The app automatically detects web mode and works without the Tauri backend.
+
+### Quick Deploy
+
+1. **Via Cloudflare Dashboard** (Recommended)
+   - Login to [Cloudflare Pages](https://dash.cloudflare.com/pages)
+   - Click "Create a project" → "Connect to Git"
+   - Select this repository
+   - Use these settings:
+     ```
+     Build command: npm run build
+     Build output directory: dist
+     ```
+   - Click "Save and Deploy"
+
+2. **Via Wrangler CLI**
+   ```bash
+   npm install -g wrangler
+   wrangler login
+   npm run build
+   wrangler pages deploy dist --project-name=jimbo-devassist-hub
+   ```
+
+📚 **Full deployment guide**: See [CLOUDFLARE_DEPLOYMENT.md](CLOUDFLARE_DEPLOYMENT.md) (English) or [CLOUDFLARE_DEPLOYMENT_PL.md](CLOUDFLARE_DEPLOYMENT_PL.md) (Polish)
+
+### Web Mode Features
+
+When deployed on Cloudflare Pages:
+- ✅ **Blog System**: Fully functional with localStorage
+- ✅ **Code Editor**: Full Monaco Editor support
+- ✅ **AI Assistant**: Direct API calls to AI providers
+- ✅ **Dashboard & UI**: Complete cyberpunk interface
+- ⚠️ **Terminal**: Not available (desktop-only)
+- ⚠️ **File System**: Limited to browser APIs
+
 ## 🤖 AI Configuration Guide
 
 ### Getting OpenAI API Key

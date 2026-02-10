@@ -1,0 +1,14 @@
+name = "jimbo-devassist-hub"
+compatibility_date = "2024-01-01"
+
+[site]
+bucket = "./dist"
+
+# Pages configuration
+pages_build_output_dir = "./dist"
+
+# Custom build command (optional - Cloudflare Pages can detect Vite projects automatically)
+# build_command = "npm run build"
+
+# Node.js version for build
+# node_version = "18"

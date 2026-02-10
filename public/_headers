@@ -1,0 +1,50 @@
+# Security and Performance Headers for Cloudflare Pages
+
+/*
+  # Security Headers
+  X-Frame-Options: DENY
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: accelerometer=(), camera=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), payment=(), usb=()
+  
+  # Content Security Policy (relaxed for development, adjust for production)
+  # Note: Allowing external API calls for AI providers and Google Fonts
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https://api.openai.com https://api.anthropic.com https://openrouter.ai https://generativelanguage.googleapis.com https://api.mistral.ai https://api.cohere.ai http://localhost:11434;
+
+/assets/*
+  # Cache static assets for 1 year
+  Cache-Control: public, max-age=31536000, immutable
+
+/*.js
+  # Cache JavaScript files
+  Cache-Control: public, max-age=31536000, immutable
+  Content-Type: application/javascript; charset=utf-8
+
+/*.css
+  # Cache CSS files
+  Cache-Control: public, max-age=31536000, immutable
+  Content-Type: text/css; charset=utf-8
+
+/*.svg
+  # Cache SVG files
+  Cache-Control: public, max-age=31536000, immutable
+  Content-Type: image/svg+xml
+
+/*.png
+  # Cache PNG images
+  Cache-Control: public, max-age=31536000, immutable
+  Content-Type: image/png
+
+/*.jpg
+  # Cache JPG images
+  Cache-Control: public, max-age=31536000, immutable
+  Content-Type: image/jpeg
+
+/*.ico
+  # Cache favicon
+  Cache-Control: public, max-age=31536000, immutable
+  Content-Type: image/x-icon
+
+/index.html
+  # Don't cache the main HTML file
+  Cache-Control: public, max-age=0, must-revalidate

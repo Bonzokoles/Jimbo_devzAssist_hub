@@ -12,6 +12,7 @@ import AIAssistant from './components/AIAssistant';
 import Settings from './components/Settings';
 import Terminal from './components/Terminal';
 import Infrastructure from './components/Infrastructure';
+import BlogHub from './components/BlogHub';
 import useStore from './store/useStore';
 import './App.css';
 
@@ -23,6 +24,8 @@ function App() {
     switch (currentView) {
       case 'dashboard':
         return <Dashboard />;
+      case 'blog':
+        return <BlogHub />;
       case 'editor':
         return <CodeEditor />;
       case 'libraries':

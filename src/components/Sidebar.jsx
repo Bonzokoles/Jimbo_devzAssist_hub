@@ -7,7 +7,8 @@ import {
   FiTerminal, 
   FiSettings,
   FiServer,
-  FiPackage
+  FiPackage,
+  FiBookOpen
 } from 'react-icons/fi';
 import useStore from '../store/useStore';
 import { loadCustomLogo } from '../utils/branding';
@@ -27,6 +28,7 @@ const Sidebar = () => {
 
   const menuItems = [
     { id: 'dashboard', icon: FiHome, label: 'Dashboard' },
+    { id: 'blog', icon: FiBookOpen, label: 'Blog' },
     { id: 'editor', icon: FiCode, label: 'Code Editor' },
     { id: 'libraries', icon: FiPackage, label: 'Libraries' },
     { id: 'monitor', icon: FiActivity, label: 'System Monitor' },

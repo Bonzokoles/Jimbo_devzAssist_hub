@@ -32,7 +32,7 @@
   padding: 1rem;
   background: rgba(0, 240, 255, 0.05);
   border: 1px solid rgba(0, 240, 255, 0.2);
-  border-radius: 8px;
+  border-radius: 0px;
   cursor: pointer;
   transition: all 0.2s ease;
 }
@@ -87,7 +87,7 @@
   width: 18px;
   height: 18px;
   border: 2px solid rgba(255, 255, 255, 0.3);
-  border-radius: 4px;
+  border-radius: 0px;
 }
 
 .context-preview-section {
@@ -98,7 +98,7 @@
   padding: 0.5rem 1rem;
   background: rgba(0, 240, 255, 0.1);
   border: 1px solid rgba(0, 240, 255, 0.3);
-  border-radius: 6px;
+  border-radius: 0px;
   color: #00f0ff;
   cursor: pointer;
   font-size: 0.9rem;
@@ -115,7 +115,7 @@
   padding: 1rem;
   background: rgba(0, 0, 0, 0.3);
   border: 1px solid rgba(0, 240, 255, 0.2);
-  border-radius: 6px;
+  border-radius: 0px;
 }
 
 .context-preview pre {
@@ -136,7 +136,7 @@
   padding: 0.75rem 1.5rem;
   background: linear-gradient(135deg, #00f0ff 0%, #0080ff 100%);
   border: none;
-  border-radius: 6px;
+  border-radius: 0px;
   color: #000;
   font-weight: 600;
   cursor: pointer;

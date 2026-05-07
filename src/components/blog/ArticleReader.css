@@ -22,7 +22,7 @@
   background: var(--glass-bg);
   backdrop-filter: blur(20px);
   border: 1px solid var(--glass-border);
-  border-radius: 12px;
+  border-radius: 0px;
   padding: 40px;
   animation: fadeIn 0.5s ease;
 }
@@ -85,7 +85,7 @@
   padding: 4px 12px;
   background: rgba(255, 0, 110, 0.1);
   border: 1px solid rgba(255, 0, 110, 0.3);
-  border-radius: 4px;
+  border-radius: 0px;
   font-size: 0.85em;
   color: var(--neon-pink);
   text-transform: uppercase;
@@ -140,7 +140,7 @@
 .reader-body code {
   background: rgba(0, 240, 255, 0.1);
   padding: 3px 8px;
-  border-radius: 4px;
+  border-radius: 0px;
   color: var(--neon-cyan);
   font-family: 'Fira Code', monospace;
   font-size: 0.9em;
@@ -149,7 +149,7 @@
 
 .reader-body pre {
   margin: 20px 0;
-  border-radius: 8px;
+  border-radius: 0px;
   overflow: hidden;
   border: 1px solid var(--neon-cyan);
   box-shadow: 0 0 20px rgba(0, 240, 255, 0.1);
@@ -211,7 +211,7 @@
 .reader-body img {
   max-width: 100%;
   height: auto;
-  border-radius: 8px;
+  border-radius: 0px;
   margin: 25px 0;
   border: 1px solid var(--glass-border);
   box-shadow: 0 0 20px rgba(0, 240, 255, 0.1);
@@ -222,7 +222,7 @@
   border-collapse: collapse;
   margin: 25px 0;
   border: 1px solid var(--glass-border);
-  border-radius: 8px;
+  border-radius: 0px;
   overflow: hidden;
 }
 

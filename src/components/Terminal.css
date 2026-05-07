@@ -123,7 +123,7 @@
 
 .scrollbar-hidden::-webkit-scrollbar-thumb {
   background: var(--glass-border);
-  border-radius: 10px;
+  border-radius: 0px;
 }
 
 .scrollbar-hidden::-webkit-scrollbar-thumb:hover {

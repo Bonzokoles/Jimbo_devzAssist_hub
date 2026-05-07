@@ -1,7 +1,7 @@
 .package-card {
   background: rgba(0, 255, 255, 0.03);
   border: 1px solid rgba(0, 255, 255, 0.2);
-  border-radius: 12px;
+  border-radius: 0px;
   padding: 1.25rem;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   display: flex;
@@ -37,7 +37,7 @@
   background: linear-gradient(135deg, var(--neon-cyan), var(--neon-purple));
   color: #000;
   padding: 0.25rem 0.625rem;
-  border-radius: 12px;
+  border-radius: 0px;
   font-size: 0.75rem;
   font-weight: 700;
   font-family: 'Fira Code', monospace;
@@ -76,7 +76,7 @@
   border: 1px solid rgba(255, 0, 110, 0.3);
   color: var(--neon-pink);
   padding: 0.25rem 0.5rem;
-  border-radius: 6px;
+  border-radius: 0px;
   font-size: 0.75rem;
   font-weight: 600;
 }
@@ -96,7 +96,7 @@
   border: 1px solid rgba(0, 240, 255, 0.2);
   color: var(--neon-cyan);
   padding: 0.25rem 0.5rem;
-  border-radius: 6px;
+  border-radius: 0px;
   font-size: 0.75rem;
   transition: all 0.2s ease;
 }
@@ -109,7 +109,7 @@
 .package-ai-explanation {
   background: rgba(176, 0, 255, 0.1);
   border: 1px solid rgba(176, 0, 255, 0.3);
-  border-radius: 8px;
+  border-radius: 0px;
   padding: 0.75rem;
   margin-top: 0.25rem;
 }
@@ -145,7 +145,7 @@
   background: linear-gradient(135deg, var(--neon-cyan), var(--neon-purple));
   border: none;
   color: #000;
-  border-radius: 6px;
+  border-radius: 0px;
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   text-transform: uppercase;
@@ -171,7 +171,7 @@
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(0, 255, 255, 0.3);
   color: var(--neon-cyan);
-  border-radius: 6px;
+  border-radius: 0px;
   cursor: pointer;
   font-size: 0.9rem;
   transition: all 0.3s ease;

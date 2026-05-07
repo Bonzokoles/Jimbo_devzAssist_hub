@@ -29,7 +29,7 @@
   background: var(--glass-bg);
   backdrop-filter: blur(20px);
   border: 1px solid var(--glass-border);
-  border-radius: 8px;
+  border-radius: 0px;
   padding: 10px 15px;
   flex: 1;
   min-width: 250px;
@@ -68,7 +68,7 @@
 
 .tag-filter {
   padding: 8px 16px;
-  border-radius: 6px;
+  border-radius: 0px;
   background: var(--glass-bg);
   border: 1px solid var(--glass-border);
   color: #e0e0e0;

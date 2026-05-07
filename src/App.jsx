@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { FiTerminal } from 'react-icons/fi';
 import Sidebar from './components/Sidebar';
 import TopBar from './components/TopBar';
@@ -14,11 +14,17 @@ import Terminal from './components/Terminal';
 import Infrastructure from './components/Infrastructure';
 import BlogHub from './components/BlogHub';
 import useStore from './store/useStore';
+import { initThemeSystem } from './utils/themeLoader';
 import './App.css';
 
 
 function App() {
   const { currentView, aiPanelOpen } = useStore();
+
+  // Initialize theme system on mount
+  useEffect(() => {
+    initThemeSystem();
+  }, []);
 
   const renderView = () => {
     switch (currentView) {

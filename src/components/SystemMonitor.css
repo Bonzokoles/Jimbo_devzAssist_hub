@@ -21,7 +21,7 @@
   background: var(--glass-bg);
   backdrop-filter: blur(20px);
   border: 1px solid var(--glass-border);
-  border-radius: 12px;
+  border-radius: 0px;
   padding: 25px;
   transition: all 0.3s ease;
 }
@@ -115,7 +115,7 @@
   background: var(--glass-bg);
   backdrop-filter: blur(20px);
   border: 1px solid var(--glass-border);
-  border-radius: 12px;
+  border-radius: 0px;
   padding: 25px;
   margin-bottom: 20px;
 }

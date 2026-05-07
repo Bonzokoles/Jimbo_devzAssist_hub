@@ -38,7 +38,7 @@
   background: rgba(0, 0, 0, 0.4);
   border: 1px solid var(--neon-cyan);
   color: var(--neon-cyan);
-  border-radius: 6px;
+  border-radius: 0px;
   cursor: pointer;
   font-size: 12px;
   transition: all 0.3s ease;
@@ -80,7 +80,7 @@
 
 .message {
   padding: 15px;
-  border-radius: 8px;
+  border-radius: 0px;
   max-width: 90%;
   animation: slideIn 0.3s ease;
 }
@@ -127,14 +127,14 @@
 .message-content code {
   background: rgba(0, 0, 0, 0.3);
   padding: 2px 6px;
-  border-radius: 3px;
+  border-radius: 0px;
   font-size: 13px;
 }
 
 .message-content pre {
   background: rgba(0, 0, 0, 0.5);
   padding: 12px;
-  border-radius: 6px;
+  border-radius: 0px;
   overflow-x: auto;
   margin: 10px 0;
   border: 1px solid var(--glass-border);
@@ -146,7 +146,7 @@
   padding: 15px;
   background: rgba(0, 255, 65, 0.1);
   border: 1px solid rgba(0, 255, 65, 0.3);
-  border-radius: 8px;
+  border-radius: 0px;
   width: fit-content;
 }
 
@@ -191,7 +191,7 @@
   background: transparent;
   border: 1px solid var(--neon-green);
   color: var(--neon-green);
-  border-radius: 6px;
+  border-radius: 0px;
   cursor: pointer;
   font-size: 11px;
   text-transform: uppercase;
@@ -228,7 +228,7 @@
   background: var(--neon-green);
   color: var(--bg-darker);
   border: none;
-  border-radius: 6px;
+  border-radius: 0px;
   cursor: pointer;
   font-size: 20px;
   display: flex;
@@ -261,7 +261,7 @@
   padding: 15px;
   background: rgba(255, 0, 110, 0.2);
   border: 1px solid rgba(255, 0, 110, 0.3);
-  border-radius: 8px;
+  border-radius: 0px;
   color: var(--neon-pink);
   font-size: 14px;
 }
@@ -293,7 +293,7 @@
   right: 0;
   background: rgba(10, 10, 30, 0.95);
   border: 1px solid rgba(0, 255, 255, 0.3);
-  border-radius: 8px;
+  border-radius: 0px;
   padding: 0.5rem;
   margin-bottom: 0.5rem;
   max-height: 300px;
@@ -307,7 +307,7 @@
   padding: 0.75rem;
   background: rgba(0, 255, 255, 0.05);
   border: 1px solid rgba(0, 255, 255, 0.2);
-  border-radius: 4px;
+  border-radius: 0px;
   color: #fff;
   cursor: pointer;
   display: flex;
@@ -365,7 +365,7 @@
   padding: 10px 15px;
   background: rgba(0, 255, 65, 0.15);
   border: 1px solid var(--neon-green);
-  border-radius: 6px;
+  border-radius: 0px;
   color: var(--neon-green);
   font-size: 13px;
   font-weight: 600;
@@ -393,7 +393,7 @@
   padding: 2px 8px;
   background: var(--neon-green);
   color: var(--bg-darker);
-  border-radius: 3px;
+  border-radius: 0px;
   font-size: 9px;
   font-weight: 700;
   letter-spacing: 1px;

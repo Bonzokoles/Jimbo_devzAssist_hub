@@ -12,7 +12,10 @@
  */
 export const AVAILABLE_THEMES = [
   'warp',
-  'techdev-dark'
+  'techdev-dark',
+  'lamborghini-aggressive',
+  'terminal-neon',
+  'vercel-minimal'
 ];
 
 /**
@@ -47,6 +50,102 @@ export async function loadTheme(themeName = DEFAULT_THEME) {
 }
 
 /**
+ * Apply meta variables (fonts, sizes)
+ * @param {Object} meta - Theme meta section
+ */
+function applyMetaVars(meta) {
+  if (!meta) return;
+  
+  const root = document.documentElement;
+  
+  if (meta.fontPrimary) {
+    root.style.setProperty('--font-primary', meta.fontPrimary);
+  }
+  
+  if (meta.fontMono) {
+    root.style.setProperty('--font-mono', meta.fontMono);
+  }
+  
+  if (meta.fontSizes) {
+    Object.entries(meta.fontSizes).forEach(([key, value]) => {
+      root.style.setProperty(`--font-size-${key}`, value);
+    });
+  }
+  
+  // TechDev border-radius enforcement (always 0px regardless of theme)
+  root.style.setProperty('--border-radius', '0px');
+  root.style.setProperty('--border-radius-small', '0px');
+  root.style.setProperty('--border-radius-medium', '0px');
+  root.style.setProperty('--border-radius-large', '0px');
+  
+  console.log('✓ Applied meta variables (fonts, sizes)');
+}
+
+/**
+ * Apply geometry variables (spacing, borders)
+ * @param {Object} geometry - Theme geometry section
+ */
+function applyGeometryVars(geometry) {
+  if (!geometry) return;
+  
+  const root = document.documentElement;
+  
+  if (geometry.spacing) {
+    Object.entries(geometry.spacing).forEach(([key, value]) => {
+      root.style.setProperty(`--spacing-${key}`, value);
+    });
+  }
+  
+  if (geometry.borderWidth) {
+    root.style.setProperty('--border-width', geometry.borderWidth);
+  }
+  
+  if (geometry.glassOpacity) {
+    root.style.setProperty('--glass-opacity', geometry.glassOpacity);
+  }
+  
+  if (geometry.focusOutlineWidth) {
+    root.style.setProperty('--focus-outline-width', geometry.focusOutlineWidth);
+  }
+  
+  console.log('✓ Applied geometry variables (spacing, borders)');
+}
+
+/**
+ * Apply shadow presets
+ * @param {Object} shadows - Theme shadows section
+ */
+function applyShadowVars(shadows) {
+  if (!shadows) return;
+  
+  const root = document.documentElement;
+  
+  Object.entries(shadows).forEach(([key, value]) => {
+    root.style.setProperty(`--shadow-${key}`, value);
+  });
+  
+  console.log(`✓ Applied ${Object.keys(shadows).length} shadow presets`);
+}
+
+/**
+ * Apply component-specific variables
+ * @param {Object} components - Theme components section
+ */
+function applyComponentVars(components) {
+  if (!components) return;
+  
+  const root = document.documentElement;
+  
+  Object.entries(components).forEach(([componentName, componentVars]) => {
+    Object.entries(componentVars).forEach(([key, value]) => {
+      root.style.setProperty(`--${componentName}-${key}`, value);
+    });
+  });
+  
+  console.log(`✓ Applied variables for ${Object.keys(components).length} components`);
+}
+
+/**
  * Apply theme variables to CSS custom properties
  * @param {Object} themeData - Theme JSON data
  */
@@ -69,11 +168,11 @@ export function applyThemeVars(themeData) {
     console.log(`✓ Applied ${Object.keys(themeData.export).length} export variables`);
   }
   
-  // Set TechDev border-radius enforcement
-  root.style.setProperty('--border-radius', '0px');
-  root.style.setProperty('--border-radius-small', '0px');
-  root.style.setProperty('--border-radius-medium', '0px');
-  root.style.setProperty('--border-radius-large', '0px');
+  // Apply extended schema sections
+  applyMetaVars(themeData.meta);
+  applyGeometryVars(themeData.geometry);
+  applyShadowVars(themeData.shadows);
+  applyComponentVars(themeData.components);
   
   // Store current theme name in localStorage
   localStorage.setItem('jimbo-current-theme', themeData.name);

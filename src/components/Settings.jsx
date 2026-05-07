@@ -14,6 +14,7 @@ import SkillsManager from './SkillsManager';
 import MOAPanel from './MOAPanel';
 import ContextSelector from './ContextSelector';
 import NetworkSettings from './NetworkSettings';
+import ThemeSelector from './ThemeSelector';
 import './Settings.css';
 
 const Settings = () => {
@@ -914,21 +915,7 @@ const Settings = () => {
               </div>
 
               <h3>Theme Settings</h3>
-              <div className="form-group">
-                <label>Theme</label>
-                <select defaultValue="cyberpunk">
-                  <option value="cyberpunk">Cyberpunk (Default)</option>
-                  <option value="dark">Dark Mode</option>
-                </select>
-              </div>
-              <div className="form-group">
-                <label>Font Size</label>
-                <select defaultValue="medium">
-                  <option value="small">Small</option>
-                  <option value="medium">Medium</option>
-                  <option value="large">Large</option>
-                </select>
-              </div>
+              <ThemeSelector />
             </div>
           )}
 

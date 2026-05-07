@@ -1,27 +1,27 @@
 {
 	"$schema": "https://raw.githubusercontent.com/badlogic/pi-mono/main/packages/coding-agent/src/modes/interactive/theme/theme-schema.json",
-	"name": "techdev-dark",
+	"name": "terminal-neon",
 	"vars": {
 		"cyan": "#00f0ff",
 		"blue": "#0080ff",
 		"green": "#00ed64",
 		"red": "#ff5b4f",
 		"yellow": "#ffff00",
-		"gray": "#afaeac",
+		"gray": "#cccccc",
 		"dimGray": "#868584",
-		"darkGray": "#353534",
+		"darkGray": "#2a4a52",
 		"accent": "#00ed64",
-		"selectedBg": "#1c1c1c",
-		"userMsgBg": "#1c1c1c",
-		"toolPendingBg": "#1c1c1c",
-		"toolSuccessBg": "#1c1c1c",
-		"toolErrorBg": "#1c1c1c",
-		"customMsgBg": "#1c1c1c"
+		"selectedBg": "#0a2e3b",
+		"userMsgBg": "#001e2b",
+		"toolPendingBg": "#0a2e3b",
+		"toolSuccessBg": "#00331f",
+		"toolErrorBg": "#330a0a",
+		"customMsgBg": "#0a2e3b"
 	},
 	"colors": {
 		"accent": "accent",
 		"border": "darkGray",
-		"borderAccent": "accent",
+		"borderAccent": "green",
 		"borderMuted": "dimGray",
 		"success": "green",
 		"error": "red",
@@ -35,32 +35,32 @@
 		"userMessageText": "",
 		"customMessageBg": "customMsgBg",
 		"customMessageText": "",
-		"customMessageLabel": "accent",
+		"customMessageLabel": "green",
 		"toolPendingBg": "toolPendingBg",
 		"toolSuccessBg": "toolSuccessBg",
 		"toolErrorBg": "toolErrorBg",
 		"toolTitle": "",
 		"toolOutput": "gray",
-		"mdHeading": "accent",
-		"mdLink": "blue",
+		"mdHeading": "green",
+		"mdLink": "cyan",
 		"mdLinkUrl": "dimGray",
-		"mdCode": "accent",
+		"mdCode": "green",
 		"mdCodeBlock": "green",
-		"mdCodeBlockBorder": "gray",
+		"mdCodeBlockBorder": "darkGray",
 		"mdQuote": "gray",
-		"mdQuoteBorder": "gray",
-		"mdHr": "gray",
-		"mdListBullet": "accent",
+		"mdQuoteBorder": "green",
+		"mdHr": "darkGray",
+		"mdListBullet": "green",
 		"toolDiffAdded": "green",
 		"toolDiffRemoved": "red",
 		"toolDiffContext": "gray",
-		"syntaxComment": "#4e6645",
-		"syntaxKeyword": "blue",
-		"syntaxFunction": "yellow",
-		"syntaxVariable": "green",
+		"syntaxComment": "#868584",
+		"syntaxKeyword": "green",
+		"syntaxFunction": "cyan",
+		"syntaxVariable": "blue",
 		"syntaxString": "green",
-		"syntaxNumber": "yellow",
-		"syntaxType": "blue",
+		"syntaxNumber": "green",
+		"syntaxType": "cyan",
 		"syntaxOperator": "gray",
 		"syntaxPunctuation": "dimGray",
 		"thinkingOff": "darkGray",
@@ -68,24 +68,24 @@
 		"thinkingLow": "gray",
 		"thinkingMedium": "blue",
 		"thinkingHigh": "green",
-		"thinkingXhigh": "accent",
+		"thinkingXhigh": "green",
 		"bashMode": "green"
 	},
 	"export": {
-		"pageBg": "#0d0d0d",
-		"cardBg": "#1c1c1c",
-		"infoBg": "#1c1c1c"
+		"pageBg": "#001e2b",
+		"cardBg": "#0a2e3b",
+		"infoBg": "#0d3844"
 	},
 	"meta": {
 		"borderRadius": "0px",
-		"fontPrimary": "CascadiaCode, 'Cascadia Code', Consolas, Monaco, 'Courier New', monospace",
-		"fontMono": "FiraCode, 'Fira Code', 'Cascadia Mono', Menlo, monospace",
+		"fontPrimary": "Source Code Pro, 'Source Code Pro', Monaco, Consolas, monospace",
+		"fontMono": "Source Code Pro, 'Source Code Pro', Menlo, monospace",
 		"fontSizes": {
-			"small": "12px",
-			"medium": "14px",
-			"large": "16px",
-			"heading": "24px",
-			"display": "32px"
+			"small": "13px",
+			"medium": "15px",
+			"large": "17px",
+			"heading": "26px",
+			"display": "36px"
 		}
 	},
 	"geometry": {
@@ -98,26 +98,26 @@
 			"xxl": "32px"
 		},
 		"borderWidth": "1px",
-		"glassOpacity": "0.05",
+		"glassOpacity": "0.08",
 		"focusOutlineWidth": "2px"
 	},
 	"shadows": {
 		"none": "none",
-		"flat": "0 0 0 1px rgba(0, 237, 100, 0.2)",
-		"border": "0 0 0 1px rgba(53, 53, 52, 1)",
-		"glow": "0 0 8px rgba(0, 237, 100, 0.4)"
+		"flat": "0 0 0 1px rgba(0, 237, 100, 0.3)",
+		"border": "0 0 0 1px rgba(42, 74, 82, 1)",
+		"glow": "0 0 10px rgba(0, 237, 100, 0.5), 0 0 20px rgba(0, 237, 100, 0.2)"
 	},
 	"components": {
 		"terminal": {
-			"background": "#001e2b",
+			"background": "#001118",
 			"foreground": "#00ed64",
-			"cursor": "#00ed64",
-			"selection": "rgba(0, 237, 100, 0.3)"
+			"cursor": "#00ff41",
+			"selection": "rgba(0, 237, 100, 0.35)"
 		},
 		"sidebar": {
-			"background": "#0a0a0a",
-			"border": "#353534",
-			"itemHover": "#1c1c1c",
+			"background": "#001118",
+			"border": "#2a4a52",
+			"itemHover": "#0a2e3b",
 			"itemActive": "#00ed64"
 		},
 		"monitor": {
@@ -125,13 +125,13 @@
 			"graphSuccess": "#00ff41",
 			"graphWarning": "#ffff00",
 			"graphError": "#ff5b4f",
-			"gridColor": "#353534"
+			"gridColor": "#2a4a52"
 		},
 		"editor": {
-			"background": "#0d0d0d",
+			"background": "#001e2b",
 			"lineNumberColor": "#868584",
-			"selectionBg": "rgba(0, 237, 100, 0.2)",
-			"cursorColor": "#00ed64"
+			"selectionBg": "rgba(0, 237, 100, 0.25)",
+			"cursorColor": "#00ff41"
 		}
 	}
 }

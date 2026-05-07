@@ -1,7 +1,11 @@
 :root {
   /* Theme System Variables (loaded from JSON via themeLoader.js) */
-  /* These are set dynamically: --theme-cyan, --theme-blue, --theme-green, etc. */
+  /* Color variables: --theme-cyan, --theme-blue, --theme-green, --theme-accent, etc. */
   /* Export variables: --theme-pageBg, --theme-cardBg, --theme-infoBg */
+  /* Meta variables: --font-primary, --font-mono, --font-size-* */
+  /* Geometry: --spacing-*, --border-width, --glass-opacity, --focus-outline-width */
+  /* Shadows: --shadow-none, --shadow-flat, --shadow-border, --shadow-glow */
+  /* Components: --terminal-*, --sidebar-*, --monitor-*, --editor-* */
   
   /* TechDev Aesthetic Enforcement */
   --border-radius: 0px;
@@ -9,27 +13,51 @@
   --border-radius-medium: 0px;
   --border-radius-large: 0px;
   
+  /* Typography (use theme fonts with fallbacks) */
+  --font-family-primary: var(--font-primary, 'CascadiaCode', 'Cascadia Code', Consolas, Monaco, 'Courier New', monospace);
+  --font-family-mono: var(--font-mono, 'FiraCode', 'Fira Code', Menlo, monospace);
+  --font-family-heading: var(--font-primary, 'Orbitron', sans-serif);
+  
+  /* Font sizes from theme */
+  --text-xs: var(--font-size-small, 12px);
+  --text-sm: var(--font-size-medium, 14px);
+  --text-base: var(--font-size-large, 16px);
+  --text-lg: var(--font-size-heading, 24px);
+  --text-xl: var(--font-size-display, 32px);
+  
+  /* Spacing from theme geometry */
+  --space-xs: var(--spacing-xs, 4px);
+  --space-sm: var(--spacing-sm, 8px);
+  --space-md: var(--spacing-md, 12px);
+  --space-lg: var(--spacing-lg, 16px);
+  --space-xl: var(--spacing-xl, 24px);
+  --space-xxl: var(--spacing-xxl, 32px);
+  
   /* Brighter neons (fallback if theme not loaded) */
-  --neon-green: var(--theme-green, #00ff41);
+  --neon-green: var(--theme-green, #00ed64);
   --neon-cyan: var(--theme-cyan, #00f0ff);
   --neon-pink: #ff006e;
   --neon-purple: #b000ff;
   
   /* Lighter backgrounds (use theme vars when available) */
-  --bg-dark: var(--theme-pageBg, #0a0e27);
-  --bg-darker: var(--theme-cardBg, #050814);
+  --bg-dark: var(--theme-pageBg, #0d0d0d);
+  --bg-darker: var(--theme-cardBg, #1c1c1c);
   
-  /* More visible glass */
-  --glass-bg: rgba(255, 255, 255, 0.05);
+  /* Glass effect with theme variables */
+  --glass-bg: rgba(255, 255, 255, var(--glass-opacity, 0.05));
   --glass-border: var(--theme-darkGray, rgba(255, 255, 255, 0.1));
   
   /* Semantic theme colors */
-  --accent: var(--theme-accent, #00f0ff);
-  --success: var(--theme-green, #00ff41);
+  --accent: var(--theme-accent, #00ed64);
+  --success: var(--theme-green, #00ed64);
   --error: var(--theme-red, #ff5b4f);
   --warning: var(--theme-yellow, #ffff00);
   --border: var(--theme-darkGray, #353534);
   --text: var(--theme-gray, #e0e0e0);
+  
+  /* Shadow presets from theme */
+  --shadow-default: var(--shadow-border, 0 0 0 1px rgba(53, 53, 52, 1));
+  --shadow-focus: var(--shadow-glow, 0 0 8px rgba(0, 237, 100, 0.4));
 }
 
 * {
@@ -39,44 +67,49 @@
 }
 
 body {
-  font-family: 'Rajdhani', sans-serif;
+  font-family: var(--font-family-primary);
+  font-size: var(--text-sm);
   background: var(--bg-darker);
-  color: #e0e0e0; /* brighter text, was #a0a0a0 */
+  color: var(--text);
   overflow: hidden;
 }
 
 h1, h2, h3, h4, h5, h6 {
-  font-family: 'Orbitron', sans-serif;
+  font-family: var(--font-family-heading);
   text-transform: uppercase;
   letter-spacing: 2px;
+  color: var(--accent);
 }
 
 code, pre {
-  font-family: 'Fira Code', monospace;
+  font-family: var(--font-family-mono);
 }
 
 /* Glassmorphism Card */
 /* Global Dark Forms & Buttons */
 input, select, textarea {
-  background: #0d1117 !important;  /* was #020205 */
-  color: #e0e0e0 !important;       /* was #a0a0a0 */
-  border: 1px solid var(--glass-border) !important;
-  border-radius: 0px;
-  padding: 8px 12px;
-  font-family: 'Rajdhani', sans-serif;
+  background: var(--bg-dark) !important;
+  color: var(--text) !important;
+  border: var(--border-width, 1px) solid var(--border) !important;
+  border-radius: var(--border-radius);
+  padding: var(--space-sm) var(--space-md);
+  font-family: var(--font-family-primary);
+  font-size: var(--text-sm);
   transition: all 0.3s ease;
 }
 
 input:focus, select:focus {
-  border-color: var(--neon-cyan) !important;
-  box-shadow: 0 0 10px rgba(0, 240, 255, 0.2);
-  outline: none;
+  border-color: var(--accent) !important;
+  box-shadow: var(--shadow-focus);
+  outline: var(--focus-outline-width, 2px) solid transparent;
 }
 
 button:not(.primary) {
-  background: #050508;
-  color: #e0e0e0;  /* was #a0a0a0 */
-  border: 1px solid var(--glass-border);
+  background: var(--bg-darker);
+  color: var(--text);
+  border: var(--border-width, 1px) solid var(--border);
+  padding: var(--space-sm) var(--space-lg);
+  font-size: var(--text-sm);
   transition: all 0.3s ease;
 }
 

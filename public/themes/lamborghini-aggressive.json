@@ -1,0 +1,137 @@
+{
+	"$schema": "https://raw.githubusercontent.com/badlogic/pi-mono/main/packages/coding-agent/src/modes/interactive/theme/theme-schema.json",
+	"name": "lamborghini-aggressive",
+	"vars": {
+		"cyan": "#40e0d0",
+		"blue": "#4a90e2",
+		"green": "#00ff88",
+		"red": "#ff3333",
+		"yellow": "#ffc000",
+		"gray": "#999999",
+		"dimGray": "#666666",
+		"darkGray": "#333333",
+		"accent": "#ffc000",
+		"selectedBg": "#1a1a1a",
+		"userMsgBg": "#0a0a0a",
+		"toolPendingBg": "#1a1a1a",
+		"toolSuccessBg": "#0a0a0a",
+		"toolErrorBg": "#1a0000",
+		"customMsgBg": "#1a1a1a"
+	},
+	"colors": {
+		"accent": "accent",
+		"border": "darkGray",
+		"borderAccent": "yellow",
+		"borderMuted": "dimGray",
+		"success": "green",
+		"error": "red",
+		"warning": "yellow",
+		"muted": "gray",
+		"dim": "dimGray",
+		"text": "",
+		"thinkingText": "gray",
+		"selectedBg": "selectedBg",
+		"userMessageBg": "userMsgBg",
+		"userMessageText": "",
+		"customMessageBg": "customMsgBg",
+		"customMessageText": "",
+		"customMessageLabel": "yellow",
+		"toolPendingBg": "toolPendingBg",
+		"toolSuccessBg": "toolSuccessBg",
+		"toolErrorBg": "toolErrorBg",
+		"toolTitle": "",
+		"toolOutput": "gray",
+		"mdHeading": "yellow",
+		"mdLink": "cyan",
+		"mdLinkUrl": "dimGray",
+		"mdCode": "yellow",
+		"mdCodeBlock": "green",
+		"mdCodeBlockBorder": "darkGray",
+		"mdQuote": "gray",
+		"mdQuoteBorder": "yellow",
+		"mdHr": "darkGray",
+		"mdListBullet": "yellow",
+		"toolDiffAdded": "green",
+		"toolDiffRemoved": "red",
+		"toolDiffContext": "gray",
+		"syntaxComment": "#666666",
+		"syntaxKeyword": "yellow",
+		"syntaxFunction": "cyan",
+		"syntaxVariable": "blue",
+		"syntaxString": "green",
+		"syntaxNumber": "yellow",
+		"syntaxType": "cyan",
+		"syntaxOperator": "gray",
+		"syntaxPunctuation": "dimGray",
+		"thinkingOff": "darkGray",
+		"thinkingMinimal": "dimGray",
+		"thinkingLow": "gray",
+		"thinkingMedium": "blue",
+		"thinkingHigh": "yellow",
+		"thinkingXhigh": "yellow",
+		"bashMode": "yellow"
+	},
+	"export": {
+		"pageBg": "#000000",
+		"cardBg": "#0a0a0a",
+		"infoBg": "#1a1a1a"
+	},
+	"meta": {
+		"borderRadius": "0px",
+		"fontPrimary": "Iosevka, 'Iosevka Term', Consolas, Monaco, monospace",
+		"fontMono": "Iosevka, 'Iosevka Term', 'Cascadia Mono', monospace",
+		"fontSizes": {
+			"small": "11px",
+			"medium": "13px",
+			"large": "15px",
+			"heading": "22px",
+			"display": "30px"
+		}
+	},
+	"geometry": {
+		"spacing": {
+			"xs": "2px",
+			"sm": "6px",
+			"md": "10px",
+			"lg": "14px",
+			"xl": "20px",
+			"xxl": "28px"
+		},
+		"borderWidth": "2px",
+		"glassOpacity": "0.03",
+		"focusOutlineWidth": "3px"
+	},
+	"shadows": {
+		"none": "none",
+		"flat": "0 0 0 2px rgba(255, 192, 0, 0.3)",
+		"border": "0 0 0 2px rgba(51, 51, 51, 1)",
+		"glow": "0 0 12px rgba(255, 192, 0, 0.6), 0 0 24px rgba(255, 192, 0, 0.3)"
+	},
+	"components": {
+		"terminal": {
+			"background": "#000000",
+			"foreground": "#ffc000",
+			"cursor": "#ffc000",
+			"selection": "rgba(255, 192, 0, 0.25)"
+		},
+		"sidebar": {
+			"background": "#000000",
+			"border": "#333333",
+			"itemHover": "#1a1a1a",
+			"itemActive": "#ffc000"
+		},
+		"monitor": {
+			"graphAccent": "#ffc000",
+			"graphSuccess": "#00ff88",
+			"graphWarning": "#ff9900",
+			"graphError": "#ff3333",
+			"gridColor": "#333333"
+		},
+		"editor": {
+			"background": "#000000",
+			"lineNumberColor": "#666666",
+			"selectionBg": "rgba(255, 192, 0, 0.15)",
+			"cursorColor": "#ffc000"
+		}
+	}
+}

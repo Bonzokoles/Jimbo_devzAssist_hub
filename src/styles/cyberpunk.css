@@ -1,16 +1,17 @@
 :root {
-  /* Further Dimmed Neons (additional ~30% reduction) */
-  --neon-green: #007d20;   /* was #00b32d */
-  --neon-cyan: #00757d;    /* was #00a8b3 */
-  --neon-pink: #7d0036;    /* was #b3004d */
-  --neon-purple: #56007d;  /* was #7b00b3 */
+  /* Brighter neons */
+  --neon-green: #00ff41;   /* was #007d20 */
+  --neon-cyan: #00f0ff;    /* was #00757d */
+  --neon-pink: #ff006e;    /* was #7d0036 */
+  --neon-purple: #b000ff;  /* was #56007d */
   
-  /* Even Darker Backgrounds */
-  --bg-dark: #03040c;      /* was #05071a */
-  --bg-darker: #010206;    /* was #02040a */
+  /* Lighter backgrounds */
+  --bg-dark: #0a0e27;      /* was #03040c */
+  --bg-darker: #050814;    /* was #010206 */
   
-  --glass-bg: rgba(255, 255, 255, 0.02);
-  --glass-border: rgba(255, 255, 255, 0.05);
+  /* More visible glass */
+  --glass-bg: rgba(255, 255, 255, 0.05);      /* was 0.02 */
+  --glass-border: rgba(255, 255, 255, 0.1);   /* was 0.05 */
 }
 
 * {
@@ -22,7 +23,7 @@
 body {
   font-family: 'Rajdhani', sans-serif;
   background: var(--bg-darker);
-  color: #a0a0a0; /* Dimmed text for lower contrast (was #fff) */
+  color: #e0e0e0; /* brighter text, was #a0a0a0 */
   overflow: hidden;
 }
 
@@ -39,8 +40,8 @@ code, pre {
 /* Glassmorphism Card */
 /* Global Dark Forms & Buttons */
 input, select, textarea {
-  background: #020205 !important;
-  color: #a0a0a0 !important;
+  background: #0d1117 !important;  /* was #020205 */
+  color: #e0e0e0 !important;       /* was #a0a0a0 */
   border: 1px solid var(--glass-border) !important;
   border-radius: 4px;
   padding: 8px 12px;
@@ -56,7 +57,7 @@ input:focus, select:focus {
 
 button:not(.primary) {
   background: #050508;
-  color: #a0a0a0;
+  color: #e0e0e0;  /* was #a0a0a0 */
   border: 1px solid var(--glass-border);
   transition: all 0.3s ease;
 }

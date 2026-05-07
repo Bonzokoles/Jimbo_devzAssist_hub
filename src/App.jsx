@@ -7,10 +7,12 @@ import CodeEditor from './components/CodeEditor';
 import FileExplorer from './components/FileExplorer';
 import SystemMonitor from './components/SystemMonitor';
 import Integrations from './components/Integrations';
+import LibrariesManager from './components/LibrariesManager';
 import AIAssistant from './components/AIAssistant';
 import Settings from './components/Settings';
 import Terminal from './components/Terminal';
 import Infrastructure from './components/Infrastructure';
+import BlogHub from './components/BlogHub';
 import useStore from './store/useStore';
 import './App.css';
 
@@ -22,8 +24,12 @@ function App() {
     switch (currentView) {
       case 'dashboard':
         return <Dashboard />;
+      case 'blog':
+        return <BlogHub />;
       case 'editor':
         return <CodeEditor />;
+      case 'libraries':
+        return <LibrariesManager />;
       case 'monitor':
         return <SystemMonitor />;
       case 'integrations':

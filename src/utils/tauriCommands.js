@@ -71,3 +71,58 @@ export const readDir = async (path) => {
     throw error;
   }
 };
+
+export const readDirRecursive = async (path) => {
+  try {
+    return await invoke('read_dir_recursive', { pathStr: path });
+  } catch (error) {
+    console.error('Failed to read directory recursively:', error);
+    throw error;
+  }
+};
+
+export const createFile = async (path, content = '') => {
+  try {
+    return await invoke('create_file', { pathStr: path, content });
+  } catch (error) {
+    console.error('Failed to create file:', error);
+    throw error;
+  }
+};
+
+export const createFolder = async (path) => {
+  try {
+    return await invoke('create_folder', { pathStr: path });
+  } catch (error) {
+    console.error('Failed to create folder:', error);
+    throw error;
+  }
+};
+
+export const deletePath = async (path) => {
+  try {
+    return await invoke('delete_path', { pathStr: path });
+  } catch (error) {
+    console.error('Failed to delete path:', error);
+    throw error;
+  }
+};
+
+export const renamePath = async (oldPath, newPath) => {
+  try {
+    return await invoke('rename_path', { oldPath, newPath });
+  } catch (error) {
+    console.error('Failed to rename path:', error);
+    throw error;
+  }
+};
+
+export const executeCode = async (command, workingDir) => {
+  try {
+    return await invoke('execute_code', { command, workingDir });
+  } catch (error) {
+    console.error('Failed to execute code:', error);
+    throw error;
+  }
+};
+

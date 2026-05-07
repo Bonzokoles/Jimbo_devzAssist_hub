@@ -1,4 +1,9 @@
 import { invoke } from '@tauri-apps/api/tauri';
+import { callOpenRouter, testOpenRouterConnection } from './providers/openrouter';
+import { callGemini, testGeminiConnection } from './providers/gemini';
+import { callMistral, testMistralConnection } from './providers/mistral';
+import { callCohere, testCohereConnection } from './providers/cohere';
+import { callOllama, testOllamaConnection } from './providers/ollama';
 
 const isTauri = window.__TAURI_IPC__ !== undefined;
 
@@ -56,37 +61,6 @@ export const callClaude = async (apiKey, model, messages) => {
   }
 };
 
-export const callOpenRouter = async (apiKey, model, messages) => {
-  try {
-    // OpenRouter works well with fetch in both environments
-    const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${apiKey}`,
-        'Content-Type': 'application/json',
-        'HTTP-Referer': 'https://github.com/Bonzokoles/Jimbo_devzAssist_hub',
-        'X-Title': 'JIMBO DevAssist'
-      },
-      body: JSON.stringify({ model, messages })
-    });
-    const data = await response.json();
-    if (data.error) throw data.error;
-    return data.choices[0].message.content;
-  } catch (error) {
-    console.error('OpenRouter API call failed:', error);
-    throw error;
-  }
-};
-
-export const testOpenRouterConnection = async (apiKey) => {
-  try {
-    await callOpenRouter(apiKey, 'openai/gpt-3.5-turbo', [{ role: 'user', content: 'Hello' }]);
-    return true;
-  } catch (error) {
-    return false;
-  }
-};
-
 export const testOpenAIConnection = async (apiKey) => {
   try {
     await callOpenAI(apiKey, 'gpt-3.5-turbo', [{ role: 'user', content: 'Hello' }]);
@@ -102,5 +76,34 @@ export const testClaudeConnection = async (apiKey) => {
     return true;
   } catch (error) {
     return false;
+  }
+};
+
+// Export provider functions
+export { callOpenRouter, testOpenRouterConnection };
+export { callGemini, testGeminiConnection };
+export { callMistral, testMistralConnection };
+export { callCohere, testCohereConnection };
+export { callOllama, testOllamaConnection };
+
+// Unified AI call function
+export const callAI = async (provider, apiKey, model, messages, baseUrl = null) => {
+  switch (provider) {
+    case 'openai':
+      return await callOpenAI(apiKey, model, messages);
+    case 'claude':
+      return await callClaude(apiKey, model, messages);
+    case 'openrouter':
+      return await callOpenRouter(apiKey, model, messages);
+    case 'gemini':
+      return await callGemini(apiKey, model, messages);
+    case 'mistral':
+      return await callMistral(apiKey, model, messages);
+    case 'cohere':
+      return await callCohere(apiKey, model, messages);
+    case 'ollama':
+      return await callOllama(baseUrl || 'http://localhost:11434', model, messages);
+    default:
+      throw new Error(`Unknown provider: ${provider}`);
   }
 };

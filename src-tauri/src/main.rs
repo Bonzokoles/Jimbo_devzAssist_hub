@@ -12,6 +12,8 @@ struct FileEntry {
     name: String,
     path: String,
     is_dir: bool,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    children: Option<Vec<FileEntry>>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -29,6 +31,13 @@ struct SystemStats {
 struct Message {
     role: String,
     content: String,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+struct ExecutionResult {
+    stdout: String,
+    stderr: String,
+    exit_code: i32,
 }
 
 #[tauri::command]
@@ -148,6 +157,250 @@ async fn call_claude_api(
 }
 
 #[tauri::command]
+async fn call_openrouter_api(
+    api_key: String,
+    model: String,
+    messages: Vec<Message>,
+) -> Result<String, String> {
+    let client = reqwest::Client::new();
+    
+    let payload = serde_json::json!({
+        "model": model,
+        "messages": messages,
+    });
+    
+    let response = client
+        .post("https://openrouter.ai/api/v1/chat/completions")
+        .header("Authorization", format!("Bearer {}", api_key))
+        .header("Content-Type", "application/json")
+        .header("HTTP-Referer", "https://bonzo-devassist.app")
+        .header("X-Title", "BONZO DevAssist AI")
+        .json(&payload)
+        .send()
+        .await
+        .map_err(|e| format!("Request failed: {}", e))?;
+    
+    if !response.status().is_success() {
+        let error_text = response.text().await.unwrap_or_else(|_| "Unknown error".to_string());
+        return Err(format!("API error: {}", error_text));
+    }
+    
+    let json: serde_json::Value = response.json().await.map_err(|e| format!("Failed to parse response: {}", e))?;
+    
+    let content = json["choices"][0]["message"]["content"]
+        .as_str()
+        .ok_or("Invalid response format")?
+        .to_string();
+    
+    Ok(content)
+}
+
+#[tauri::command]
+async fn call_gemini_api(
+    api_key: String,
+    model: String,
+    messages: Vec<Message>,
+) -> Result<String, String> {
+    let client = reqwest::Client::new();
+    
+    // Convert messages to Gemini format
+    let mut contents = vec![];
+    for msg in messages {
+        contents.push(serde_json::json!({
+            "role": if msg.role == "assistant" { "model" } else { "user" },
+            "parts": [{ "text": msg.content }]
+        }));
+    }
+    
+    let payload = serde_json::json!({
+        "contents": contents,
+    });
+    
+    let url = format!(
+        "https://generativelanguage.googleapis.com/v1beta/models/{}:generateContent?key={}",
+        model, api_key
+    );
+    
+    let response = client
+        .post(&url)
+        .header("Content-Type", "application/json")
+        .json(&payload)
+        .send()
+        .await
+        .map_err(|e| format!("Request failed: {}", e))?;
+    
+    if !response.status().is_success() {
+        let error_text = response.text().await.unwrap_or_else(|_| "Unknown error".to_string());
+        return Err(format!("API error: {}", error_text));
+    }
+    
+    let json: serde_json::Value = response.json().await.map_err(|e| format!("Failed to parse response: {}", e))?;
+    
+    let content = json["candidates"][0]["content"]["parts"][0]["text"]
+        .as_str()
+        .ok_or("Invalid response format")?
+        .to_string();
+    
+    Ok(content)
+}
+
+#[tauri::command]
+async fn call_mistral_api(
+    api_key: String,
+    model: String,
+    messages: Vec<Message>,
+) -> Result<String, String> {
+    let client = reqwest::Client::new();
+    
+    let payload = serde_json::json!({
+        "model": model,
+        "messages": messages,
+    });
+    
+    let response = client
+        .post("https://api.mistral.ai/v1/chat/completions")
+        .header("Authorization", format!("Bearer {}", api_key))
+        .header("Content-Type", "application/json")
+        .json(&payload)
+        .send()
+        .await
+        .map_err(|e| format!("Request failed: {}", e))?;
+    
+    if !response.status().is_success() {
+        let error_text = response.text().await.unwrap_or_else(|_| "Unknown error".to_string());
+        return Err(format!("API error: {}", error_text));
+    }
+    
+    let json: serde_json::Value = response.json().await.map_err(|e| format!("Failed to parse response: {}", e))?;
+    
+    let content = json["choices"][0]["message"]["content"]
+        .as_str()
+        .ok_or("Invalid response format")?
+        .to_string();
+    
+    Ok(content)
+}
+
+#[tauri::command]
+async fn call_cohere_api(
+    api_key: String,
+    model: String,
+    messages: Vec<Message>,
+) -> Result<String, String> {
+    let client = reqwest::Client::new();
+    
+    // Get the last user message
+    let message = messages.last()
+        .ok_or("No messages provided")?
+        .content.clone();
+    
+    // Build chat history (exclude last message)
+    let chat_history: Vec<_> = messages[..messages.len()-1]
+        .iter()
+        .map(|msg| serde_json::json!({
+            "role": if msg.role == "assistant" { "CHATBOT" } else { "USER" },
+            "message": msg.content
+        }))
+        .collect();
+    
+    let payload = serde_json::json!({
+        "model": model,
+        "message": message,
+        "chat_history": chat_history,
+    });
+    
+    let response = client
+        .post("https://api.cohere.ai/v1/chat")
+        .header("Authorization", format!("Bearer {}", api_key))
+        .header("Content-Type", "application/json")
+        .json(&payload)
+        .send()
+        .await
+        .map_err(|e| format!("Request failed: {}", e))?;
+    
+    if !response.status().is_success() {
+        let error_text = response.text().await.unwrap_or_else(|_| "Unknown error".to_string());
+        return Err(format!("API error: {}", error_text));
+    }
+    
+    let json: serde_json::Value = response.json().await.map_err(|e| format!("Failed to parse response: {}", e))?;
+    
+    let content = json["text"]
+        .as_str()
+        .ok_or("Invalid response format")?
+        .to_string();
+    
+    Ok(content)
+}
+
+#[tauri::command]
+async fn call_ollama_api(
+    base_url: String,
+    model: String,
+    messages: Vec<Message>,
+) -> Result<String, String> {
+    let client = reqwest::Client::new();
+    
+    let payload = serde_json::json!({
+        "model": model,
+        "messages": messages,
+        "stream": false,
+    });
+    
+    let url = format!("{}/api/chat", base_url);
+    
+    let response = client
+        .post(&url)
+        .header("Content-Type", "application/json")
+        .json(&payload)
+        .send()
+        .await
+        .map_err(|e| format!("Request failed: {}", e))?;
+    
+    if !response.status().is_success() {
+        let error_text = response.text().await.unwrap_or_else(|_| "Unknown error".to_string());
+        return Err(format!("API error: {}", error_text));
+    }
+    
+    let json: serde_json::Value = response.json().await.map_err(|e| format!("Failed to parse response: {}", e))?;
+    
+    let content = json["message"]["content"]
+        .as_str()
+        .ok_or("Invalid response format")?
+        .to_string();
+    
+    Ok(content)
+}
+
+#[tauri::command]
+async fn get_ollama_models(base_url: String) -> Result<Vec<String>, String> {
+    let client = reqwest::Client::new();
+    
+    let url = format!("{}/api/tags", base_url);
+    
+    let response = client
+        .get(&url)
+        .send()
+        .await
+        .map_err(|e| format!("Request failed: {}", e))?;
+    
+    if !response.status().is_success() {
+        return Err("Failed to get models from Ollama".to_string());
+    }
+    
+    let json: serde_json::Value = response.json().await.map_err(|e| format!("Failed to parse response: {}", e))?;
+    
+    let models = json["models"]
+        .as_array()
+        .ok_or("Invalid response format")?
+        .iter()
+        .filter_map(|m| m["name"].as_str().map(String::from))
+        .collect();
+    
+    Ok(models)
+}
+
+#[tauri::command]
 async fn save_api_key(app_handle: tauri::AppHandle, provider: String, key: String) -> Result<(), String> {
     let app_dir = path::app_data_dir(&app_handle.config())
         .ok_or("Failed to get app data directory")?;
@@ -253,6 +506,7 @@ async fn read_dir(path_str: String) -> Result<Vec<FileEntry>, String> {
             name: entry.file_name().to_string_lossy().to_string(),
             path: entry.path().to_string_lossy().to_string(),
             is_dir: metadata.is_dir(),
+            children: None,
         });
     }
     
@@ -268,6 +522,135 @@ async fn read_dir(path_str: String) -> Result<Vec<FileEntry>, String> {
     Ok(files)
 }
 
+// Recursive directory reading
+#[tauri::command]
+async fn read_dir_recursive(path_str: String) -> Result<FileEntry, String> {
+    read_dir_tree(&Path::new(&path_str))
+}
+
+fn read_dir_tree(path: &Path) -> Result<FileEntry, String> {
+    let name = path.file_name()
+        .and_then(|n| n.to_str())
+        .unwrap_or("")
+        .to_string();
+    
+    let path_string = path.to_string_lossy().to_string();
+    
+    if !path.is_dir() {
+        return Ok(FileEntry {
+            name,
+            path: path_string,
+            is_dir: false,
+            children: None,
+        });
+    }
+    
+    let mut children = Vec::new();
+    
+    match fs::read_dir(path) {
+        Ok(entries) => {
+            for entry in entries {
+                if let Ok(entry) = entry {
+                    let child_path = entry.path();
+                    // Skip hidden files/folders
+                    if let Some(file_name) = child_path.file_name() {
+                        if let Some(name_str) = file_name.to_str() {
+                            if name_str.starts_with('.') {
+                                continue;
+                            }
+                        }
+                    }
+                    if let Ok(child_entry) = read_dir_tree(&child_path) {
+                        children.push(child_entry);
+                    }
+                }
+            }
+        }
+        Err(e) => return Err(format!("Failed to read directory: {}", e)),
+    }
+    
+    // Sort: directories first, then files
+    children.sort_by(|a, b| {
+        match (a.is_dir, b.is_dir) {
+            (true, false) => std::cmp::Ordering::Less,
+            (false, true) => std::cmp::Ordering::Greater,
+            _ => a.name.to_lowercase().cmp(&b.name.to_lowercase()),
+        }
+    });
+    
+    Ok(FileEntry {
+        name,
+        path: path_string,
+        is_dir: true,
+        children: Some(children),
+    })
+}
+
+// File operations
+#[tauri::command]
+async fn create_file(path_str: String, content: String) -> Result<(), String> {
+    // Create parent directories if they don't exist
+    let path = Path::new(&path_str);
+    if let Some(parent) = path.parent() {
+        fs::create_dir_all(parent)
+            .map_err(|e| format!("Failed to create parent directories: {}", e))?;
+    }
+    fs::write(&path_str, content)
+        .map_err(|e| format!("Failed to create file: {}", e))
+}
+
+#[tauri::command]
+async fn create_folder(path_str: String) -> Result<(), String> {
+    fs::create_dir_all(&path_str)
+        .map_err(|e| format!("Failed to create folder: {}", e))
+}
+
+#[tauri::command]
+async fn delete_path(path_str: String) -> Result<(), String> {
+    let path = Path::new(&path_str);
+    
+    if path.is_dir() {
+        fs::remove_dir_all(path)
+            .map_err(|e| format!("Failed to delete folder: {}", e))
+    } else {
+        fs::remove_file(path)
+            .map_err(|e| format!("Failed to delete file: {}", e))
+    }
+}
+
+#[tauri::command]
+async fn rename_path(old_path: String, new_path: String) -> Result<(), String> {
+    fs::rename(&old_path, &new_path)
+        .map_err(|e| format!("Failed to rename: {}", e))
+}
+
+// Code execution
+#[tauri::command]
+async fn execute_code(command: String, working_dir: String) -> Result<ExecutionResult, String> {
+    use std::process::Command;
+    
+    // Parse the command - split by space but respect quotes
+    let parts: Vec<&str> = command.split_whitespace().collect();
+    if parts.is_empty() {
+        return Err("Empty command".to_string());
+    }
+    
+    let program = parts[0];
+    let args = &parts[1..];
+    
+    let output = Command::new(program)
+        .args(args)
+        .current_dir(&working_dir)
+        .output()
+        .map_err(|e| format!("Failed to execute command: {}", e))?;
+    
+    Ok(ExecutionResult {
+        stdout: String::from_utf8_lossy(&output.stdout).to_string(),
+        stderr: String::from_utf8_lossy(&output.stderr).to_string(),
+        exit_code: output.status.code().unwrap_or(-1),
+    })
+}
+
 fn main() {
     tauri::Builder::default()
         .invoke_handler(tauri::generate_handler![
@@ -276,6 +659,12 @@ fn main() {
             optimize_memory,
             call_openai_api,
             call_claude_api,
+            call_openrouter_api,
+            call_gemini_api,
+            call_mistral_api,
+            call_cohere_api,
+            call_ollama_api,
+            get_ollama_models,
             save_api_key,
             get_api_key,
             read_file_content,
@@ -285,6 +674,12 @@ fn main() {
             manage_podman_container,
             check_localhost_port,
             read_dir,
+            read_dir_recursive,
+            create_file,
+            create_folder,
+            delete_path,
+            rename_path,
+            execute_code,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

@@ -4,7 +4,7 @@
 use serde::{Deserialize, Serialize};
 use std::fs;
 use std::path::Path;
-use sysinfo::{System, SystemExt, CpuExt, DiskExt};
+use sysinfo::System;
 use tauri::api::path;
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -41,19 +41,10 @@ async fn get_system_stats() -> Result<SystemStats, String> {
     let memory_used = sys.used_memory();
     let memory_percent = (memory_used as f32 / memory_total as f32) * 100.0;
     
-    let mut disk_total = 0;
-    let mut disk_used = 0;
-    
-    for disk in sys.disks() {
-        disk_total += disk.total_space();
-        disk_used += disk.total_space() - disk.available_space();
-    }
-    
-    let disk_percent = if disk_total > 0 {
-        (disk_used as f32 / disk_total as f32) * 100.0
-    } else {
-        0.0
-    };
+    // TODO: Fix disk stats for sysinfo 0.30+
+    let disk_total = 0u64;
+    let disk_used = 0u64;
+    let disk_percent = 0.0f32;
     
     Ok(SystemStats {
         cpu_usage,
@@ -189,7 +180,27 @@ async fn read_file_content(path_str: String) -> Result<String, String> {
     fs::read_to_string(path).map_err(|e| format!("Failed to read file: {}", e))
 }
 
+#[tauri::command]
+async fn write_file_content(path_str: String, content: String) -> Result<(), String> {
+    let path = Path::new(&path_str);
     fs::write(path, content).map_err(|e| format!("Failed to write file: {}", e))
+}
+
+#[tauri::command]
+async fn execute_command(command: String, args: Vec<String>) -> Result<String, String> {
+    let output = std::process::Command::new(&command)
+        .args(&args)
+        .output()
+        .map_err(|e| format!("Failed to execute command: {}", e))?;
+
+    let stdout = String::from_utf8_lossy(&output.stdout).to_string();
+    let stderr = String::from_utf8_lossy(&output.stderr).to_string();
+
+    if !output.status.success() {
+        return Ok(format!("{}\n{}", stdout, stderr));
+    }
+
+    Ok(format!("{}\n{}", stdout, stderr))
 }
 
 #[tauri::command]
@@ -269,6 +280,7 @@ fn main() {
             get_api_key,
             read_file_content,
             write_file_content,
+            execute_command,
             get_podman_containers,
             manage_podman_container,
             check_localhost_port,

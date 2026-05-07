@@ -25,7 +25,17 @@
         "scope": ["**"]
       },
       "shell": {
-        "open": true
+        "all": true,
+        "open": true,
+        "execute": true,
+        "sidecar": true,
+        "scope": [
+          { "name": "powershell", "cmd": "powershell", "args": true },
+          { "name": "cmd", "cmd": "cmd", "args": true },
+          { "name": "npm", "cmd": "npm", "args": true },
+          { "name": "node", "cmd": "node", "args": true },
+          { "name": "git", "cmd": "git", "args": true }
+        ]
       },
       "http": {
         "all": true,

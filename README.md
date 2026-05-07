@@ -344,6 +344,11 @@ This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) 
 - **OpenAI & Anthropic** - For AI API access
 - **Cyberpunk Aesthetic** - Inspired by cyberpunk culture and neon aesthetics
 
+## 📚 Additional Resources
+
+- **[RAG, Agent & Vector DB Visualization Resources](RAG_AGENT_VISUALIZATION_RESOURCES.md)** - Comprehensive guide to tools for visualizing RAG databases, agent workflows, and vector database resources
+- **[🇵🇱 Przewodnik Wizualizacji (Polski)](PRZEWODNIK_WIZUALIZACJA_RAG_PL.md)** - Polish quick reference guide for RAG and agent visualization tools
+
 ## 📧 Support
 
 For issues, questions, or suggestions:
